@@ -220,3 +220,186 @@ input:focus, select:focus, textarea:focus {
         height: 400px;
     }
 }
+
+/* Melhorias para dispositivos móveis */
+@media (max-width: 640px) {
+    /* Navbar simplificada */
+    .navbar-mobile-simplified {
+        padding: 0.5rem;
+    }
+    
+    .navbar-mobile-simplified h1 {
+        font-size: 1rem;
+    }
+    
+    .navbar-mobile-simplified span.badge {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.3rem;
+    }
+    
+    /* Botão de menu lateral */
+    .mobile-menu-btn {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 9999px;
+        background-color: #3b82f6;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 20;
+        transition: transform 0.3s ease;
+    }
+    
+    .mobile-menu-btn:active {
+        transform: scale(0.95);
+    }
+    
+    /* Sidebar em dispositivos móveis */
+    @media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 80%;
+            max-width: 320px;
+            z-index: 50;
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        /* Overlay para fechar sidebar ao clicar fora */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* Ajuste de conteúdo principal quando sidebar está aberta */
+        .content-pushed {
+            transform: translateX(80%);
+            transition: transform 0.3s ease;
+        }
+    }
+    
+    /* Ajustes para formulários */
+    .form-mobile-friendly input,
+    .form-mobile-friendly select,
+    .form-mobile-friendly textarea {
+        font-size: 16px; /* Evita zoom automático em iOS */
+        padding: 0.75rem;
+    }
+    
+    /* Ajustes para botões em dispositivos móveis */
+    .btn-mobile-friendly {
+        min-height: 3rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Gráficos compactos */
+    .chart-container-mobile {
+        height: 250px;
+    }
+    
+    /* Cards em uma coluna */
+    .grid-mobile-1col {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Tabelas responsivas */
+    .table-mobile-friendly {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Navegação entre abas */
+    .tabs-mobile {
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+    
+    .tabs-mobile::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+    
+    .tab-mobile {
+        white-space: nowrap;
+        flex-shrink: 0;
+        padding: 0.5rem 1rem;
+    }
+    
+    /* Mensagens de toast mais visíveis */
+    #toast.mobile {
+        max-width: 100%;
+        width: calc(100% - 2rem);
+        bottom: 5rem;
+        right: 1rem;
+    }
+    
+    /* Modais adaptados */
+    .modal-mobile {
+        width: 95%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+
+/* Ajustes para dispositivos muito pequenos */
+@media (max-width: 360px) {
+    .xs-text-smaller {
+        font-size: 0.75rem;
+    }
+    
+    .xs-hidden {
+        display: none;
+    }
+}
+
+/* Melhorias de usabilidade para touch */
+@media (pointer: coarse) {
+    .touch-target {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .touch-padding {
+        padding: 0.75rem !important;
+    }
+    
+    /* Espaçamento maior entre elementos clicáveis */
+    .touch-spacing > * + * {
+        margin-top: 0.5rem;
+    }
+    
+    /* Tabelas com linhas maiores */
+    .touch-table tr td,
+    .touch-table tr th {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+}
