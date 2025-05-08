@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação da API - Sistema Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* Estilos específicos para a documentação */
+        .api-method {
+            border-left: 4px solid;
+            padding-left: 1rem;
+        }
+        .method-get {
+            border-color: #3b82f6;
+        }
+        .method-post {
+            border-color: #10b981;
+        }
+        .method-put {
+            border-color: #f59e0b;
+        }
+        .method-delete {
+            border-color: #ef4444;
+        }
+        
+        .param-type {
+            font-family: monospace;
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            background-color: #f3f4f6;
+            font-size: 0.85em;
+        }
+        
+        .code-block {
+            background-color: #1f2937;
+            color: #f9fafb;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        
+        .response-example {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .nav-link.active {
+            color: #3b82f6;
+            font-weight: 600;
+            border-left: 3px solid #3b82f6;
+            padding-left: 0.5rem;
+            margin-left: -0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded">Documentação da API</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="../index.html" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar ao Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto py-8 px-4">
+        <div class="flex flex-col md:flex-row">
+            <!-- Barra lateral de navegação -->
+            <div class="w-full md:w-64 mb-8 md:mb-0 md:mr-8">
+                <div class="bg-white rounded-lg shadow-md p-4 sticky top-8">
+                    <h2 class="text-lg font-bold mb-4">Índice</h2>
+                    <nav class="space-y-2">
+                        <div class="mb-3">
+                            <h3 class="text-gray-500 uppercase text-xs font-bold mb-2">Introdução</h3>
+                            <ul class="space-y-1">
+                                <li><a href="#intro" class="text-gray-700 hover:text-blue-600 nav-link">Visão Geral</a></li>
+                                <li><a href="#authentication" class="text-gray-700 hover:text-blue-600 nav-link">Autenticação</a></li>
+                                <li><a href="#error-handling" class="text-gray-700 hover:text-blue-600 nav-link">Tratamento de Erros</a></li>
+                            </ul>
+                        </div>
+                        <div class="mb-3">
+                            <h3 class="text-gray-500 uppercase text-xs font-bold mb-2">Endpoints</h3>
+                            <ul class="space-y-1">
+                                <li><a href="#patterns" class="text-gray-700 hover:text-blue-600 nav-link">Padrões</a></li>
+                                <li><a href="#trades" class="text-gray-700 hover:text-blue-600 nav-link">Trades</a></li>
+                                <li><a href="#statistics" class="text-gray-700 hover:text-blue-600 nav-link">Estatísticas</a></li>
+                                <li><a href="#contexts" class="text-gray-700 hover:text-blue-600 nav-link">Contextos</a></li>
+                                <li><a href="#timeframes" class="text-gray-700 hover:text-blue-600 nav-link">Timeframes</a></li>
+                                <li><a href="#journal" class="text-gray-700 hover:text-blue-600 nav-link">Diário</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 uppercase text-xs font-bold mb-2">Objetos</h3>
+                            <ul class="space-y-1">
+                                <li><a href="#object-pattern" class="text-gray-700 hover:text-blue-600 nav-link">Objeto Padrão</a></li>
+                                <li><a href="#object-trade" class="text-gray-700 hover:text-blue-600 nav-link">Objeto Trade</a></li>
+                                <li><a href="#object-context" class="text-gray-700 hover:text-blue-600 nav-link">Objeto Contexto</a></li>
+                                <li><a href="#object-timeframe" class="text-gray-700 hover:text-blue-600 nav-link">Objeto Timeframe</a></li>
+                                <li><a href="#object-journal" class="text-gray-700 hover:text-blue-600 nav-link">Objeto Entrada Diário</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Conteúdo principal -->
+            <div class="flex-1">
+                <!-- Introdução -->
+                <section id="intro" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">Documentação da API</h2>
+                    <p class="mb-4">
+                        Esta documentação descreve os endpoints disponíveis na API do Sistema de Quantificação Price Action Brooks.
+                        A API permite acessar e gerenciar dados de padrões, trades, estatísticas e mais.
+                    </p>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    A URL base para todos os endpoints é: <code class="bg-blue-100 px-1 py-0.5 rounded">https://api.priceactionsystem.com/v1</code>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-bold mt-6 mb-2">Requisitos</h3>
+                    <p>Para utilizar a API, você precisará:</p>
+                    <ul class="list-disc pl-5 mb-4 space-y-1">
+                        <li>Um token de acesso válido (veja a seção de <a href="#authentication" class="text-blue-600 hover:underline">Autenticação</a>)</li>
+                        <li>Enviar solicitações usando HTTPS</li>
+                        <li>Incluir os cabeçalhos necessários com cada solicitação</li>
+                    </ul>
+                </section>
+
+                <!-- Autenticação -->
+                <section id="authentication" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">Autenticação</h2>
+                    <p class="mb-4">
+                        Todas as solicitações à API devem incluir um token de autenticação JWT no cabeçalho.
+                        O token pode ser obtido através do endpoint de login.
+                    </p>
+                    <div class="api-method method-post mb-6">
+                        <h3 class="text-xl font-bold mb-2">POST /auth/login</h3>
+                        <p class="text-gray-600 mb-4">Obtenha um token de autenticação.</p>
+                        
+                        <h4 class="font-bold mb-2">Corpo da Requisição</h4>
+                        <table class="min-w-full mb-4">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left">Parâmetro</th>
+                                    <th class="py-2 px-4 text-left">Tipo</th>
+                                    <th class="py-2 px-4 text-left">Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">email</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Endereço de e-mail registrado</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">password</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Senha da conta</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Requisição</h4>
+                        <pre class="code-block">
+POST /auth/login HTTP/1.1
+Host: api.priceactionsystem.com
+Content-Type: application/json
+
+{
+  "email": "usuario@exemplo.com",
+  "password": "senha123"
+}
+</pre>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Resposta</h4>
+                        <pre class="code-block">
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expiresIn": 3600,
+    "user": {
+      "id": "123456",
+      "name": "Usuário de Exemplo",
+      "email": "usuario@exemplo.com"
+    }
+  }
+}
+</pre>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold mb-2">Usando o Token</h3>
+                    <p class="mb-4">
+                        Inclua o token em todas as solicitações subsequentes no cabeçalho <code>Authorization</code>:
+                    </p>
+                    <pre class="code-block">
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+</pre>
+                </section>
+
+                <!-- Tratamento de Erros -->
+                <section id="error-handling" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">Tratamento de Erros</h2>
+                    <p class="mb-4">
+                        A API utiliza códigos de status HTTP padrão para indicar o sucesso ou falha de uma requisição.
+                        Em caso de erro, o corpo da resposta contém informações detalhadas sobre o problema.
+                    </p>
+                    
+                    <h3 class="text-lg font-bold mb-2">Códigos de Status</h3>
+                    <table class="min-w-full mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="py-2 px-4 text-left">Código</th>
+                                <th class="py-2 px-4 text-left">Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">200 - OK</td>
+                                <td class="py-2 px-4">A requisição foi bem-sucedida</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">201 - Created</td>
+                                <td class="py-2 px-4">Um novo recurso foi criado com sucesso</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">400 - Bad Request</td>
+                                <td class="py-2 px-4">A requisição é inválida ou malformada</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">401 - Unauthorized</td>
+                                <td class="py-2 px-4">Autenticação necessária ou inválida</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">403 - Forbidden</td>
+                                <td class="py-2 px-4">Sem permissão para acessar o recurso</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">404 - Not Found</td>
+                                <td class="py-2 px-4">Recurso não encontrado</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">422 - Unprocessable Entity</td>
+                                <td class="py-2 px-4">Validação falhou</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">429 - Too Many Requests</td>
+                                <td class="py-2 px-4">Limite de requisições excedido</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">500 - Internal Server Error</td>
+                                <td class="py-2 px-4">Erro interno do servidor</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h3 class="text-lg font-bold mb-2">Formato de Erro</h3>
+                    <p class="mb-4">
+                        Em caso de erro, a API retorna uma resposta no seguinte formato:
+                    </p>
+                    <pre class="code-block">
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Dados inválidos",
+    "details": [
+      {
+        "field": "email",
+        "message": "E-mail inválido"
+      }
+    ]
+  }
+}
+</pre>
+                </section>
+
+                <!-- Padrões -->
+                <section id="patterns" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">Padrões</h2>
+                    <p class="mb-4">
+                        Os endpoints de padrões permitem acessar e gerenciar padrões de price action de Al Brooks.
+                    </p>
+                    
+                    <!-- GET /patterns -->
+                    <div class="api-method method-get mb-6">
+                        <h3 class="text-xl font-bold mb-2">GET /patterns</h3>
+                        <p class="text-gray-600 mb-4">Obtém a lista de todos os padrões.</p>
+                        
+                        <h4 class="font-bold mb-2">Parâmetros de Consulta</h4>
+                        <table class="min-w-full mb-4">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left">Parâmetro</th>
+                                    <th class="py-2 px-4 text-left">Tipo</th>
+                                    <th class="py-2 px-4 text-left">Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">category</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por categoria (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">strength</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por força do padrão (A, B, C) (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">limit</td>
+                                    <td class="py-2 px-4"><span class="param-type">integer</span></td>
+                                    <td class="py-2 px-4">Limita o número de resultados (padrão: 50)</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4">offset</td>
+                                    <td class="py-2 px-4"><span class="param-type">integer</span></td>
+                                    <td class="py-2 px-4">Deslocamento para paginação (padrão: 0)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Requisição</h4>
+                        <pre class="code-block">
+GET /patterns?category=Reversão&strength=A HTTP/1.1
+Host: api.priceactionsystem.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+</pre>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Resposta</h4>
+                        <pre class="code-block response-example">
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "success": true,
+  "data": {
+    "patterns": [
+      {
+        "ID": "P001",
+        "Nome": "Wedge Top",
+        "Categoria": "Reversão",
+        "Descrição": "Padrão de reversão de alta onde o preço forma três topos ascendentes com momentum decrescente.",
+        "Força": "A",
+        "Probabilidade Base": "65%",
+        "Contexto Ideal": "Final de tendência de alta",
+        "created_at": "2023-01-15T10:30:00Z",
+        "updated_at": "2023-05-20T14:15:00Z"
+      },
+      {
+        "ID": "P002",
+        "Nome": "Double Top",
+        "Categoria": "Reversão",
+        "Descrição": "Padrão de reversão de alta onde o preço forma dois topos aproximadamente no mesmo nível.",
+        "Força": "A",
+        "Probabilidade Base": "62%",
+        "Contexto Ideal": "Final de tendência de alta",
+        "created_at": "2023-01-15T10:35:00Z",
+        "updated_at": "2023-05-20T14:20:00Z"
+      }
+      // ... mais padrões
+    ],
+    "meta": {
+      "total": 12,
+      "limit": 50,
+      "offset": 0
+    }
+  }
+}
+</pre>
+                    </div>
+                    
+                    <!-- GET /patterns/{id} -->
+                    <div class="api-method method-get mb-6">
+                        <h3 class="text-xl font-bold mb-2">GET /patterns/{id}</h3>
+                        <p class="text-gray-600 mb-4">Obtém detalhes de um padrão específico.</p>
+                        
+                        <h4 class="font-bold mb-2">Parâmetros de Caminho</h4>
+                        <table class="min-w-full mb-4">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left">Parâmetro</th>
+                                    <th class="py-2 px-4 text-left">Tipo</th>
+                                    <th class="py-2 px-4 text-left">Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="py-2 px-4">id</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">ID do padrão</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Requisição</h4>
+                        <pre class="code-block">
+GET /patterns/P001 HTTP/1.1
+Host: api.priceactionsystem.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+</pre>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Resposta</h4>
+                        <pre class="code-block">
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "success": true,
+  "data": {
+    "ID": "P001",
+    "Nome": "Wedge Top",
+    "Categoria": "Reversão",
+    "Descrição": "Padrão de reversão de alta onde o preço forma três topos ascendentes com momentum decrescente.",
+    "Força": "A",
+    "Probabilidade Base": "65%",
+    "Contexto Ideal": "Final de tendência de alta",
+    "created_at": "2023-01-15T10:30:00Z",
+    "updated_at": "2023-05-20T14:15:00Z",
+    "stats": {
+      "totalTrades": 125,
+      "winRate": 0.68,
+      "expectancy": 1.2,
+      "profitFactor": 2.8
+    },
+    "contextPerformance": [
+      {
+        "context": "Tendência de Alta",
+        "winRate": 0.72,
+        "expectancy": 1.5,
+        "trades": 65
+      },
+      {
+        "context": "Correção",
+        "winRate": 0.64,
+        "expectancy": 0.9,
+        "trades": 42
+      },
+      {
+        "context": "Range",
+        "winRate": 0.61,
+        "expectancy": 0.7,
+        "trades": 18
+      }
+    ]
+  }
+}
+</pre>
+                    </div>
+                    
+                    <!-- Adicionar aqui outros endpoints de padrões (POST, PUT, DELETE) -->
+                </section>
+
+                <!-- Trades -->
+                <section id="trades" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">Trades</h2>
+                    <p class="mb-4">
+                        Os endpoints de trades permitem acessar e gerenciar registros de operações.
+                    </p>
+                    
+                    <!-- GET /trades -->
+                    <div class="api-method method-get mb-6">
+                        <h3 class="text-xl font-bold mb-2">GET /trades</h3>
+                        <p class="text-gray-600 mb-4">Obtém a lista de todos os trades.</p>
+                        
+                        <h4 class="font-bold mb-2">Parâmetros de Consulta</h4>
+                        <table class="min-w-full mb-4">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left">Parâmetro</th>
+                                    <th class="py-2 px-4 text-left">Tipo</th>
+                                    <th class="py-2 px-4 text-left">Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">pattern</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por nome do padrão (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">context</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por contexto de mercado (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">timeframe</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por timeframe (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">direction</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por direção (Long/Short) (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">dateFrom</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Data inicial no formato YYYY-MM-DD (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">dateTo</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Data final no formato YYYY-MM-DD (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">result</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por resultado (win/loss) (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">limit</td>
+                                    <td class="py-2 px-4"><span class="param-type">integer</span></td>
+                                    <td class="py-2 px-4">Limita o número de resultados (padrão: 50)</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4">offset</td>
+                                    <td class="py-2 px-4"><span class="param-type">integer</span></td>
+                                    <td class="py-2 px-4">Deslocamento para paginação (padrão: 0)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Requisição</h4>
+                        <pre class="code-block">
+GET /trades?pattern=Wedge%20Top&result=win&limit=10 HTTP/1.1
+Host: api.priceactionsystem.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+</pre>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Resposta</h4>
+                        <pre class="code-block response-example">
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "success": true,
+  "data": {
+    "trades": [
+      {
+        "ID": "T001",
+        "Data e Hora": "2023-05-18T09:30:00Z",
+        "Padrão Brooks": "Wedge Top",
+        "Par de Moedas": "EUR/USD",
+        "Timeframe": "H1",
+        "Contexto de Mercado": "Tendência de Alta",
+        "Direção": "Short",
+        "Qualidade do Setup": "A",
+        "Entrada": "1.0850",
+        "Stop": "1.0875",
+        "Alvo": "1.0800",
+        "Resultado (R)": "2.0",
+        "Observações": "Setup claro com volume crescente.",
+        "created_at": "2023-05-18T15:45:00Z",
+        "updated_at": "2023-05-18T15:45:00Z"
+      },
+      // ... mais trades
+    ],
+    "meta": {
+      "total": 37,
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}
+</pre>
+                    </div>
+                    
+                    <!-- GET /trades/{id} -->
+                    <div class="api-method method-get mb-6">
+                        <h3 class="text-xl font-bold mb-2">GET /trades/{id}</h3>
+                        <p class="text-gray-600 mb-4">Obtém detalhes de um trade específico.</p>
+                        
+                        <h4 class="font-bold mb-2">Parâmetros de Caminho</h4>
+                        <table class="min-w-full mb-4">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left">Parâmetro</th>
+                                    <th class="py-2 px-4 text-left">Tipo</th>
+                                    <th class="py-2 px-4 text-left">Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="py-2 px-4">id</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">ID do trade</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Requisição</h4>
+                        <pre class="code-block">
+GET /trades/T001 HTTP/1.1
+Host: api.priceactionsystem.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+</pre>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Resposta</h4>
+                        <pre class="code-block">
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "success": true,
+  "data": {
+    "ID": "T001",
+    "Data e Hora": "2023-05-18T09:30:00Z",
+    "Padrão Brooks": "Wedge Top",
+    "Par de Moedas": "EUR/USD",
+    "Timeframe": "H1",
+    "Contexto de Mercado": "Tendência de Alta",
+    "Direção": "Short",
+    "Qualidade do Setup": "A",
+    "Entrada": "1.0850",
+    "Stop": "1.0875",
+    "Alvo": "1.0800",
+    "Resultado (R)": "2.0",
+    "Observações": "Setup claro com volume crescente.",
+    "Screenshot": "https://storage.priceactionsystem.com/screenshots/T001.jpg",
+    "created_at": "2023-05-18T15:45:00Z",
+    "updated_at": "2023-05-18T15:45:00Z",
+    "journalEntries": [
+      {
+        "ID": "J005",
+        "Data": "2023-05-18T16:00:00Z",
+        "Conteúdo": "Este trade teve excelente execução...",
+        "created_at": "2023-05-18T16:00:00Z"
+      }
+    ]
+  }
+}
+</pre>
+                    </div>
+                    
+                    <!-- POST /trades -->
+                    <div class="api-method method-post mb-6">
+                        <h3 class="text-xl font-bold mb-2">POST /trades</h3>
+                        <p class="text-gray-600 mb-4">Cria um novo registro de trade.</p>
+                        
+                        <h4 class="font-bold mb-2">Corpo da Requisição</h4>
+                        <table class="min-w-full mb-4">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left">Parâmetro</th>
+                                    <th class="py-2 px-4 text-left">Tipo</th>
+                                    <th class="py-2 px-4 text-left">Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">dateTime</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Data e hora no formato ISO</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">pattern</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Nome do padrão Brooks</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">pair</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Par de moedas ou ativo</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">timeframe</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Timeframe do trade</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">context</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Contexto de mercado</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">direction</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Direção (Long/Short)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">quality</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Qualidade do setup (A, B, C)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">entry</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Preço de entrada</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">stop</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Preço de stop loss</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">target</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Preço alvo</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">result</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Resultado em R</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4">notes</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Observações (opcional)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Requisição</h4>
+                        <pre class="code-block">
+POST /trades HTTP/1.1
+Host: api.priceactionsystem.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+{
+  "dateTime": "2023-05-18T09:30:00Z",
+  "pattern": "Wedge Top",
+  "pair": "EUR/USD",
+  "timeframe": "H1",
+  "context": "Tendência de Alta",
+  "direction": "Short",
+  "quality": "A",
+  "entry": "1.0850",
+  "stop": "1.0875",
+  "target": "1.0800",
+  "result": "2.0",
+  "notes": "Setup claro com volume crescente."
+}
+</pre>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Resposta</h4>
+                        <pre class="code-block">
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{
+  "success": true,
+  "data": {
+    "ID": "T123",
+    "Data e Hora": "2023-05-18T09:30:00Z",
+    "Padrão Brooks": "Wedge Top",
+    "Par de Moedas": "EUR/USD",
+    "Timeframe": "H1",
+    "Contexto de Mercado": "Tendência de Alta",
+    "Direção": "Short",
+    "Qualidade do Setup": "A",
+    "Entrada": "1.0850",
+    "Stop": "1.0875",
+    "Alvo": "1.0800",
+    "Resultado (R)": "2.0",
+    "Observações": "Setup claro com volume crescente.",
+    "created_at": "2023-05-18T15:45:00Z",
+    "updated_at": "2023-05-18T15:45:00Z"
+  },
+  "message": "Trade criado com sucesso."
+}
+</pre>
+                    </div>
+                    
+                    <!-- Adicionar aqui outros endpoints de trades (PUT, DELETE) -->
+                </section>
+
+                <!-- Estatísticas -->
+                <section id="statistics" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">Estatísticas</h2>
+                    <p class="mb-4">
+                        Os endpoints de estatísticas permitem obter métricas e análises dos trades registrados.
+                    </p>
+                    
+                    <!-- GET /statistics/summary -->
+                    <div class="api-method method-get mb-6">
+                        <h3 class="text-xl font-bold mb-2">GET /statistics/summary</h3>
+                        <p class="text-gray-600 mb-4">Obtém um resumo das estatísticas de trading.</p>
+                        
+                        <h4 class="font-bold mb-2">Parâmetros de Consulta</h4>
+                        <table class="min-w-full mb-4">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left">Parâmetro</th>
+                                    <th class="py-2 px-4 text-left">Tipo</th>
+                                    <th class="py-2 px-4 text-left">Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">dateFrom</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Data inicial no formato YYYY-MM-DD (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">dateTo</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Data final no formato YYYY-MM-DD (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">period</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Período predefinido (month, 3months, 6months, year) (opcional)</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-2 px-4">pattern</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por padrão específico (opcional)</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 px-4">timeframe</td>
+                                    <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                    <td class="py-2 px-4">Filtra por timeframe específico (opcional)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Requisição</h4>
+                        <pre class="code-block">
+GET /statistics/summary?period=3months HTTP/1.1
+Host: api.priceactionsystem.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+</pre>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Resposta</h4>
+                        <pre class="code-block">
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "success": true,
+  "data": {
+    "totalTrades": 87,
+    "winningTrades": 52,
+    "losingTrades": 35,
+    "winRate": 0.598,
+    "expectancy": 0.82,
+    "profitFactor": 2.1,
+    "averageWin": 1.68,
+    "averageLoss": 0.85,
+    "largestWin": 5.2,
+    "largestLoss": 2.0,
+    "bestPattern": {
+      "name": "Wedge Top",
+      "winRate": 0.75,
+      "expectancy": 1.35,
+      "trades": 16
+    },
+    "worstPattern": {
+      "name": "Failed Final Flag",
+      "winRate": 0.33,
+      "expectancy": -0.45,
+      "trades": 9
+    },
+    "period": {
+      "from": "2023-02-18",
+      "to": "2023-05-18",
+      "label": "Últimos 3 meses"
+    }
+  }
+}
+</pre>
+                    </div>
+                    
+                    <!-- GET /statistics/patterns -->
+                    <div class="api-method method-get mb-6">
+                        <h3 class="text-xl font-bold mb-2">GET /statistics/patterns</h3>
+                        <p class="text-gray-600 mb-4">Obtém estatísticas de desempenho por padrão.</p>
+                        
+                        <h4 class="font-bold mb-2">Parâmetros de Consulta</h4>
+                        <p class="mb-4">
+                            Os mesmos parâmetros de filtro do endpoint <code>/statistics/summary</code>.
+                        </p>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Requisição</h4>
+                        <pre class="code-block">
+GET /statistics/patterns?period=6months HTTP/1.1
+Host: api.priceactionsystem.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+</pre>
+                        
+                        <h4 class="font-bold mb-2">Exemplo de Resposta</h4>
+                        <pre class="code-block response-example">
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "success": true,
+  "data": {
+    "patterns": [
+      {
+        "name": "Wedge Top",
+        "trades": 24,
+        "winRate": 0.75,
+        "expectancy": 1.35,
+        "profitFactor": 3.2,
+        "category": "Reversão"
+      },
+      {
+        "name": "Double Bottom",
+        "trades": 18,
+        "winRate": 0.72,
+        "expectancy": 1.28,
+        "profitFactor": 2.9,
+        "category": "Reversão"
+      },
+      {
+        "name": "Pullback to EMA",
+        "trades": 32,
+        "winRate": 0.66,
+        "expectancy": 0.95,
+        "profitFactor": 2.3,
+        "category": "Continuação"
+      },
+      // ... mais padrões
+    ],
+    "period": {
+      "from": "2022-11-18",
+      "to": "2023-05-18",
+      "label": "Últimos 6 meses"
+    }
+  }
+}
+</pre>
+                    </div>
+                    
+                    <!-- Adicionar aqui outros endpoints de estatísticas -->
+                </section>
+
+                <!-- Outras seções: Contextos, Timeframes, Diário, etc. -->
+                <!-- ... -->
+
+                <!-- Definições de Objetos -->
+                <section id="object-pattern" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">Objeto Padrão</h2>
+                    <p class="mb-4">
+                        Estrutura do objeto Padrão retornado pela API.
+                    </p>
+                    
+                    <table class="min-w-full mb-4">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="py-2 px-4 text-left">Campo</th>
+                                <th class="py-2 px-4 text-left">Tipo</th>
+                                <th class="py-2 px-4 text-left">Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">ID</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Identificador único do padrão</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Nome</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Nome do padrão</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Categoria</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Categoria do padrão (ex: Reversão, Continuação)</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Descrição</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Descrição detalhada do padrão</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Força</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Classificação de força (A, B ou C)</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Probabilidade Base</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Probabilidade base de sucesso</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Contexto Ideal</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Contexto ideal para usar este padrão</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">created_at</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Data de criação no formato ISO</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">updated_at</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Data da última atualização no formato ISO</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section id="object-trade" class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-4">Objeto Trade</h2>
+                    <p class="mb-4">
+                        Estrutura do objeto Trade retornado pela API.
+                    </p>
+                    
+                    <table class="min-w-full mb-4">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="py-2 px-4 text-left">Campo</th>
+                                <th class="py-2 px-4 text-left">Tipo</th>
+                                <th class="py-2 px-4 text-left">Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">ID</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Identificador único do trade</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Data e Hora</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Data e hora do trade no formato ISO</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Padrão Brooks</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Nome do padrão utilizado</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Par de Moedas</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Par de moedas ou ativo negociado</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Timeframe</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Timeframe do trade</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Contexto de Mercado</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Contexto de mercado durante o trade</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Direção</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Direção do trade (Long ou Short)</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Qualidade do Setup</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Avaliação da qualidade do setup (A, B ou C)</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Entrada</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Preço de entrada</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Stop</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Preço de stop loss</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Alvo</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Preço alvo</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Resultado (R)</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Resultado em múltiplos de R</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">Observações</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Observações sobre o trade</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-2 px-4">created_at</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Data de criação no formato ISO</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4">updated_at</td>
+                                <td class="py-2 px-4"><span class="param-type">string</span></td>
+                                <td class="py-2 px-4">Data da última atualização no formato ISO</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Definições para outros objetos -->
+                <!-- ... -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script para navegação e scroll suave
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remover classe ativa de todos os links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Adicionar classe ativa ao link clicado
+                    this.classList.add('active');
+                    
+                    // Obter o id da seção alvo
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        // Rolar para a seção alvo com animação suave
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 20,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Detectar qual seção está visível durante o scroll
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.scrollY + 100;
+                
+                document.querySelectorAll('section').forEach(section => {
+                    if (
+                        section.offsetTop <= scrollPosition &&
+                        section.offsetTop + section.offsetHeight > scrollPosition
+                    ) {
+                        const id = section.getAttribute('id');
+                        navLinks.forEach(link => {
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            } else {
+                                link.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
