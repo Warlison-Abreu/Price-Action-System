@@ -18,7 +18,16 @@ const statsData = {
         timeframe: 'all',
         type: 'all'
     },
-    charts: {}
+    charts: {},
+    periodBData: { // Adicionado conforme atualização
+        trades: [],
+        dateRange: {
+            from: null,
+            to: null,
+            label: 'Nenhum período selecionado'
+        },
+        normalized: true
+    },
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -142,6 +151,9 @@ function setupEventListeners() {
             exportStatisticsData();
         });
     }
+
+    // Configurar eventos da comparação de períodos // Adicionado conforme atualização
+    setupComparisonEvents(); // Adicionado conforme atualização
 }
 
 /**
@@ -292,6 +304,11 @@ function applyFilters() {
     
     // Atualizar estatísticas e gráficos
     updateStatistics();
+
+    // Atualizar comparação de períodos se já estiver configurada
+    if (statsData.periodBData.dateRange.from && statsData.periodBData.dateRange.to) {
+        loadPeriodBTrades(); // Recarregar dados do período B com os novos filtros do período A
+    }
     
     // Exibir mensagem de sucesso
     Utils.showToast('Filtros aplicados com sucesso.', 'success');
@@ -2350,3 +2367,666 @@ function exportStatisticsData() {
         Utils.showToast('Erro ao exportar dados. Tente novamente.', 'error');
     }
 }
+
+// --- INÍCIO DO CÓDIGO ADICIONADO CONFORME ATUALIZAÇÃO ---
+/**
+ * Configura os eventos da comparação de períodos
+ */
+function setupComparisonEvents() {
+    // Botão de configurar comparação
+    const configBtn = document.getElementById('configure-comparison-btn');
+    if (configBtn) {
+        configBtn.addEventListener('click', showComparisonModal);
+    }
+    
+    // Botão de fechar modal
+    const closeModalBtn = document.getElementById('close-comparison-modal');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', hideComparisonModal);
+    }
+    
+    // Botão de cancelar
+    const cancelBtn = document.getElementById('cancel-comparison-btn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', hideComparisonModal);
+    }
+    
+    // Formulário de comparação
+    const comparisonForm = document.getElementById('comparison-form');
+    if (comparisonForm) {
+        comparisonForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyComparisonSettings();
+        });
+    }
+    
+    // Alternar entre tipos de período
+    const periodBType = document.getElementById('period-b-type');
+    if (periodBType) {
+        periodBType.addEventListener('change', function() {
+            const presetContainer = document.getElementById('preset-period-container');
+            const customContainer = document.getElementById('custom-period-container');
+            
+            if (this.value === 'preset') {
+                presetContainer.classList.remove('hidden');
+                customContainer.classList.add('hidden');
+            } else {
+                presetContainer.classList.add('hidden');
+                customContainer.classList.remove('hidden');
+            }
+        });
+    }
+}
+
+/**
+ * Exibe o modal de configuração de comparação
+ */
+function showComparisonModal() {
+    // Preencher informações do período atual (A)
+    const periodLabel = generatePeriodLabel(statsData.currentFilters);
+    document.getElementById('period-a-display').value = periodLabel;
+    
+    // Configurar data atual para período personalizado
+    const today = new Date();
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
+    
+    document.getElementById('period-b-from').value = threeMonthsAgo.toISOString().split('T')[0];
+    document.getElementById('period-b-to').value = today.toISOString().split('T')[0];
+    
+    // Exibir modal
+    document.getElementById('comparison-modal').classList.remove('hidden');
+}
+
+/**
+ * Esconde o modal de configuração de comparação
+ */
+function hideComparisonModal() {
+    document.getElementById('comparison-modal').classList.add('hidden');
+}
+
+/**
+ * Gera um rótulo descritivo para o período com base nos filtros
+ * @param {Object} filters - Filtros aplicados
+ * @returns {string} - Rótulo do período
+ */
+function generatePeriodLabel(filters) {
+    let label = '';
+    
+    // Período
+    if (filters.dateFrom && filters.dateTo) {
+        const fromDate = Utils.formatDate(filters.dateFrom, 'short');
+        const toDate = Utils.formatDate(filters.dateTo, 'short');
+        label = `${fromDate} - ${toDate}`;
+    } else if (filters.period !== 'all') {
+        switch (filters.period) {
+            case 'month':
+                label = 'Último mês';
+                break;
+            case '3months':
+                label = 'Últimos 3 meses';
+                break;
+            case '6months':
+                label = 'Últimos 6 meses';
+                break;
+            case 'year':
+                label = 'Último ano';
+                break;
+            default:
+                label = 'Todo o histórico';
+        }
+    } else {
+        label = 'Todo o histórico';
+    }
+    
+    // Adicionar outros filtros
+    const additionalFilters = [];
+    
+    if (filters.pair !== 'all') additionalFilters.push(`Par: ${filters.pair}`);
+    if (filters.timeframe !== 'all') additionalFilters.push(`TF: ${filters.timeframe}`);
+    if (filters.type !== 'all') additionalFilters.push(`Tipo: ${filters.type}`);
+    
+    if (additionalFilters.length > 0) {
+        label += ` (${additionalFilters.join(', ')})`;
+    }
+    
+    return label;
+}
+
+/**
+ * Aplica as configurações de comparação de períodos
+ */
+async function applyComparisonSettings() {
+    try {
+        // Obter configurações
+        const periodType = document.getElementById('period-b-type').value;
+        const normalized = document.getElementById('normalize-data').checked;
+        
+        // Determinar datas do período B
+        let dateFrom, dateTo, periodLabel;
+        
+        if (periodType === 'preset') {
+            const presetType = document.getElementById('preset-period').value;
+            const today = new Date();
+            dateTo = today.toISOString().split('T')[0];
+            
+            switch (presetType) {
+                case 'last-month':
+                    const oneMonthAgo = new Date();
+                    oneMonthAgo.setMonth(today.getMonth() - 1);
+                    dateFrom = oneMonthAgo.toISOString().split('T')[0];
+                    periodLabel = 'Último mês';
+                    break;
+                case 'last-3-months':
+                    const threeMonthsAgo = new Date();
+                    threeMonthsAgo.setMonth(today.getMonth() - 3);
+                    dateFrom = threeMonthsAgo.toISOString().split('T')[0];
+                    periodLabel = 'Últimos 3 meses';
+                    break;
+                case 'last-6-months':
+                    const sixMonthsAgo = new Date();
+                    sixMonthsAgo.setMonth(today.getMonth() - 6);
+                    dateFrom = sixMonthsAgo.toISOString().split('T')[0];
+                    periodLabel = 'Últimos 6 meses';
+                    break;
+                case 'last-year':
+                    const oneYearAgo = new Date();
+                    oneYearAgo.setFullYear(today.getFullYear() - 1);
+                    dateFrom = oneYearAgo.toISOString().split('T')[0];
+                    periodLabel = 'Último ano';
+                    break;
+                case 'previous-period':
+                    // Calcular período anterior equivalente com base nos filtros atuais
+                    if (statsData.currentFilters.dateFrom && statsData.currentFilters.dateTo) {
+                        const currentFrom = new Date(statsData.currentFilters.dateFrom);
+                        const currentTo = new Date(statsData.currentFilters.dateTo);
+                        const duration = currentTo - currentFrom;
+                        
+                        dateTo = new Date(currentFrom).toISOString().split('T')[0];
+                        const previousFrom = new Date(currentFrom.getTime() - duration);
+                        dateFrom = previousFrom.toISOString().split('T')[0];
+                        
+                        periodLabel = `Período anterior (${Utils.formatDate(dateFrom, 'short')} - ${Utils.formatDate(dateTo, 'short')})`;
+                    } else {
+                        // Se não houver período definido, usar os últimos 3 meses como padrão
+                        const threeMonthsAgo = new Date();
+                        threeMonthsAgo.setMonth(today.getMonth() - 3);
+                        dateFrom = threeMonthsAgo.toISOString().split('T')[0];
+                        periodLabel = 'Últimos 3 meses';
+                    }
+                    break;
+            }
+        } else {
+            // Período personalizado
+            dateFrom = document.getElementById('period-b-from').value;
+            dateTo = document.getElementById('period-b-to').value;
+            
+            if (!dateFrom || !dateTo) {
+                Utils.showToast('Por favor, selecione datas válidas para o período B.', 'error');
+                return;
+            }
+            
+            periodLabel = `${Utils.formatDate(dateFrom, 'short')} - ${Utils.formatDate(dateTo, 'short')}`;
+        }
+        
+        // Atualizar estado
+        statsData.periodBData.dateRange = {
+            from: dateFrom,
+            to: dateTo,
+            label: periodLabel
+        };
+        
+        statsData.periodBData.normalized = normalized;
+        
+        // Carregar trades do período B
+        await loadPeriodBTrades();
+        
+        // Esconder modal
+        hideComparisonModal();
+        
+        // Mostrar mensagem de sucesso
+        Utils.showToast('Comparação de períodos configurada com sucesso.', 'success');
+    } catch (error) {
+        console.error('Erro ao configurar comparação:', error);
+        Utils.showToast('Erro ao configurar comparação. Tente novamente.', 'error');
+    }
+}
+
+/**
+ * Carrega trades do período B para comparação
+ */
+async function loadPeriodBTrades() {
+    try {
+        const { from, to } = statsData.periodBData.dateRange;
+        
+        // Construir parâmetros de filtro
+        const filterParams = {
+            dateFrom: from,
+            dateTo: to
+        };
+        
+        // Aplicar os mesmos filtros do período A (exceto datas)
+        if (statsData.currentFilters.pair !== 'all') {
+            filterParams.pair = statsData.currentFilters.pair;
+        }
+        
+        if (statsData.currentFilters.timeframe !== 'all') {
+            filterParams.timeframe = statsData.currentFilters.timeframe;
+        }
+        
+        if (statsData.currentFilters.type !== 'all') {
+            filterParams.type = statsData.currentFilters.type;
+        }
+        
+        // Carregar trades filtrados
+        const trades = await API.getTrades(filterParams);
+        statsData.periodBData.trades = trades;
+        
+        // Atualizar visualizações de comparação
+        updatePeriodsComparison();
+    } catch (error) {
+        console.error('Erro ao carregar trades do período B:', error);
+        Utils.showToast('Erro ao carregar trades para comparação. Tente novamente.', 'error');
+    }
+}
+
+/**
+ * Atualiza todas as visualizações de comparação entre períodos
+ */
+function updatePeriodsComparison() {
+    // Atualizar informações dos períodos
+    updatePeriodInfo('a', statsData.filteredTrades, statsData.currentFilters);
+    updatePeriodInfo('b', statsData.periodBData.trades, statsData.periodBData.dateRange);
+    
+    // Atualizar tabela de comparação
+    updateComparisonTable();
+    
+    // Atualizar gráfico de comparação
+    createPeriodsComparisonChart();
+}
+
+/**
+ * Atualiza as informações de um período na interface
+ * @param {string} periodId - Identificador do período ('a' ou 'b')
+ * @param {Array} trades - Lista de trades do período
+ * @param {Object} filters - Filtros ou range do período
+ */
+function updatePeriodInfo(periodId, trades, filters) {
+    // Atualizar range de data
+    let dateRangeLabel;
+    
+    if (periodId === 'a') {
+        dateRangeLabel = generatePeriodLabel(filters);
+    } else {
+        dateRangeLabel = filters.label || 'Nenhum período selecionado';
+    }
+    
+    document.getElementById(`period-${periodId}-date-range`).textContent = dateRangeLabel;
+    
+    // Verificar se há trades para calcular estatísticas
+    if (!trades || trades.length === 0) {
+        document.getElementById(`period-${periodId}-trades-count`).textContent = '0';
+        document.getElementById(`period-${periodId}-win-rate`).textContent = '0.0%';
+        document.getElementById(`period-${periodId}-expectancy`).textContent = '0.00R';
+        document.getElementById(`period-${periodId}-profit-factor`).textContent = '0.00';
+        return;
+    }
+    
+    // Calcular estatísticas
+    const stats = calculateStatistics(trades);
+    
+    // Atualizar na interface
+    document.getElementById(`period-${periodId}-trades-count`).textContent = stats.totalTrades;
+    document.getElementById(`period-${periodId}-win-rate`).textContent = Utils.formatPercentage(stats.winRate);
+    document.getElementById(`period-${periodId}-expectancy`).textContent = Utils.formatR(stats.expectancy);
+    document.getElementById(`period-${periodId}-profit-factor`).textContent = 
+        stats.profitFactor === Infinity ? '∞' : stats.profitFactor.toFixed(2);
+}
+
+/**
+ * Atualiza a tabela de comparação entre períodos
+ */
+function updateComparisonTable() {
+    const tableBody = document.getElementById('comparison-table');
+    
+    // Limpar tabela
+    tableBody.innerHTML = '';
+    
+    // Verificar se há dados para comparar
+    if (!statsData.filteredTrades || !statsData.periodBData.trades || 
+        statsData.filteredTrades.length === 0 || statsData.periodBData.trades.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="4" class="py-4 text-center text-gray-500">Dados insuficientes para comparação.</td>
+        `;
+        tableBody.appendChild(row);
+        return;
+    }
+    
+    // Calcular estatísticas para ambos os períodos
+    const statsA = calculateStatistics(statsData.filteredTrades);
+    const statsB = calculateStatistics(statsData.periodBData.trades);
+    
+    // Adicionar linha para cada métrica
+    addComparisonRow(tableBody, 'Número de Trades', statsA.totalTrades, statsB.totalTrades, false, 'N', 0);
+    addComparisonRow(tableBody, 'Taxa de Acerto', statsA.winRate, statsB.winRate, true, '%', 1);
+    addComparisonRow(tableBody, 'Expectativa', statsA.expectancy, statsB.expectancy, true, 'R', 2);
+    
+    // Fator de Lucro (caso especial devido a possível infinito)
+    const pfA = statsA.profitFactor === Infinity ? '∞' : statsA.profitFactor.toFixed(2);
+    const pfB = statsB.profitFactor === Infinity ? '∞' : statsB.profitFactor.toFixed(2);
+    
+    let pfDiff, pfDiffFormatted;
+    if (statsA.profitFactor === Infinity || statsB.profitFactor === Infinity) {
+        pfDiff = statsA.profitFactor === statsB.profitFactor ? 0 : (statsA.profitFactor === Infinity ? 1 : -1);
+        pfDiffFormatted = pfDiff === 0 ? '0' : (pfDiff > 0 ? '+∞' : '-∞');
+    } else {
+        pfDiff = statsA.profitFactor - statsB.profitFactor;
+        pfDiffFormatted = pfDiff > 0 ? `+${pfDiff.toFixed(2)}` : pfDiff.toFixed(2);
+    }
+    
+    const pfRow = document.createElement('tr');
+    pfRow.className = 'border-b';
+    
+    const pfDiffClass = pfDiff > 0 ? 'text-green-600 font-bold' : (pfDiff < 0 ? 'text-red-600 font-bold' : 'text-gray-600');
+    
+    pfRow.innerHTML = `
+        <td class="py-2 px-4 text-sm">Fator de Lucro</td>
+        <td class="py-2 px-4 text-sm">${pfA}</td>
+        <td class="py-2 px-4 text-sm">${pfB}</td>
+        <td class="py-2 px-4 text-sm ${pfDiffClass}">${pfDiffFormatted}</td>
+    `;
+    
+    tableBody.appendChild(pfRow);
+    
+    // Comparar distribuição de trades por resultado
+    addComparisonRow(tableBody, 'Trades com Lucro', statsA.winsCount, statsB.winsCount, true, 'N', 0);
+    addComparisonRow(tableBody, 'Trades com Perda', statsA.lossesCount, statsB.lossesCount, false, 'N', 0);
+    
+    // Comparar médias
+    addComparisonRow(tableBody, 'Média de Ganhos', statsA.avgWin, statsB.avgWin, true, 'R', 2);
+    addComparisonRow(tableBody, 'Média de Perdas', statsA.avgLoss, statsB.avgLoss, true, 'R', 2);
+}
+
+/**
+ * Adiciona uma linha à tabela de comparação
+ * @param {HTMLElement} tableBody - Elemento tbody da tabela
+ * @param {string} label - Rótulo da métrica
+ * @param {number} valueA - Valor do período A
+ * @param {number} valueB - Valor do período B
+ * @param {boolean} higherIsBetter - Se valor maior é melhor
+ * @param {string} unit - Unidade da métrica
+ * @param {number} decimals - Casas decimais para formatação
+ */
+function addComparisonRow(tableBody, label, valueA, valueB, higherIsBetter, unit, decimals) {
+    const row = document.createElement('tr');
+    row.className = 'border-b';
+    
+    // Calcular diferença absoluta e percentual
+    let diff = valueA - valueB;
+    
+    // Formatar valores
+    let formattedA, formattedB, formattedDiff;
+    
+    if (unit === '%') {
+        formattedA = (valueA * 100).toFixed(decimals) + '%';
+        formattedB = (valueB * 100).toFixed(decimals) + '%';
+        formattedDiff = (diff * 100).toFixed(decimals) + '%';
+    } else if (unit === 'R') {
+        formattedA = valueA.toFixed(decimals) + 'R';
+        formattedB = valueB.toFixed(decimals) + 'R';
+        formattedDiff = diff.toFixed(decimals) + 'R';
+    } else {
+        formattedA = valueA.toFixed(decimals);
+        formattedB = valueB.toFixed(decimals);
+        formattedDiff = diff.toFixed(decimals);
+    }
+    
+    // Se for números de trades e normalização estiver ativada, mostrar percentual em vez de absoluto
+    if (unit === 'N' && statsData.periodBData.normalized && label !== 'Número de Trades') {
+        const statsA = calculateStatistics(statsData.filteredTrades); // Recalcular para ter totalTrades do período A
+        const statsB = calculateStatistics(statsData.periodBData.trades); // Recalcular para ter totalTrades do período B
+        
+        const pctA = statsA.totalTrades > 0 ? valueA / statsA.totalTrades : 0;
+        const pctB = statsB.totalTrades > 0 ? valueB / statsB.totalTrades : 0;
+        const pctDiff = pctA - pctB;
+        
+        formattedA = `${valueA} (${(pctA * 100).toFixed(1)}%)`;
+        formattedB = `${valueB} (${(pctB * 100).toFixed(1)}%)`;
+        formattedDiff = (pctDiff * 100).toFixed(1) + '%';
+        
+        diff = pctDiff;
+    }
+    
+    // Adicionar sinal à diferença e determinar classe
+    let diffClass;
+    if (diff > 0) {
+        formattedDiff = '+' + formattedDiff;
+        diffClass = higherIsBetter ? 'text-green-600 font-bold' : 'text-red-600 font-bold';
+    } else if (diff < 0) {
+        diffClass = higherIsBetter ? 'text-red-600 font-bold' : 'text-green-600 font-bold';
+    } else {
+        diffClass = 'text-gray-600';
+    }
+    
+    row.innerHTML = `
+        <td class="py-2 px-4 text-sm">${label}</td>
+        <td class="py-2 px-4 text-sm">${formattedA}</td>
+        <td class="py-2 px-4 text-sm">${formattedB}</td>
+        <td class="py-2 px-4 text-sm ${diffClass}">${formattedDiff}</td>
+    `;
+    
+    tableBody.appendChild(row);
+}
+
+/**
+ * Cria o gráfico de comparação entre períodos
+ */
+function createPeriodsComparisonChart() {
+    // Verificar se há dados para ambos os períodos
+    if (!statsData.filteredTrades || !statsData.periodBData.trades || 
+        statsData.filteredTrades.length === 0 || statsData.periodBData.trades.length === 0) {
+        
+        // Limpar gráfico se não houver dados
+        const ctx = document.getElementById('periodsComparisonChart');
+        if (window.periodsComparisonChart) {
+            window.periodsComparisonChart.destroy();
+            window.periodsComparisonChart = null; // Garantir que seja recriado
+        }
+        // Opcional: Mostrar mensagem de "dados insuficientes" no canvas
+        const context = ctx.getContext('2d');
+        context.clearRect(0, 0, ctx.width, ctx.height);
+        context.textAlign = 'center';
+        context.fillText('Dados insuficientes para o gráfico de comparação.', ctx.width / 2, ctx.height / 2);
+        return;
+    }
+    
+    // Agrupar trades por padrão para ambos os períodos
+    const patternStatsA = groupTradesByPattern(statsData.filteredTrades);
+    const patternStatsB = groupTradesByPattern(statsData.periodBData.trades);
+    
+    // Encontrar padrões presentes em ambos os períodos
+    const patternsInBoth = [];
+    const existsInBoth = {};
+    
+    Object.keys(patternStatsA).forEach(pattern => {
+        if (patternStatsB[pattern]) {
+            patternsInBoth.push(pattern);
+            existsInBoth[pattern] = true;
+        }
+    });
+    
+    // Adicionar padrões exclusivos de cada período (opcional)
+    Object.keys(patternStatsA).forEach(pattern => {
+        if (!existsInBoth[pattern]) {
+            patternsInBoth.push(pattern);
+        }
+    });
+    
+    Object.keys(patternStatsB).forEach(pattern => {
+        if (!existsInBoth[pattern] && !patternsInBoth.includes(pattern)) {
+            patternsInBoth.push(pattern);
+        }
+    });
+    
+    // Ordenar por diferença de expectativa
+    patternsInBoth.sort((a, b) => {
+        const expA_A = patternStatsA[a] ? patternStatsA[a].expectancy : 0;
+        const expA_B = patternStatsB[a] ? patternStatsB[a].expectancy : 0;
+        const expB_A = patternStatsA[b] ? patternStatsA[b].expectancy : 0;
+        const expB_B = patternStatsB[b] ? patternStatsB[b].expectancy : 0;
+        
+        return (expA_A - expA_B) - (expB_A - expB_B); // Ordena para mostrar maiores diferenças (positivas ou negativas)
+    });
+    
+    // Limitar a 8 padrões para melhor visualização
+    const patterns = patternsInBoth.slice(0, 8);
+    
+    // Preparar dados para o gráfico
+    const expectancyA = patterns.map(pattern => patternStatsA[pattern] ? patternStatsA[pattern].expectancy : 0);
+    const expectancyB = patterns.map(pattern => patternStatsB[pattern] ? patternStatsB[pattern].expectancy : 0);
+    
+    // Obter contexto do canvas
+    const ctx = document.getElementById('periodsComparisonChart').getContext('2d');
+    
+    // Destruir gráfico anterior se existir
+    if (window.periodsComparisonChart) {
+        window.periodsComparisonChart.destroy();
+    }
+    
+    // Criar novo gráfico
+    window.periodsComparisonChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: patterns,
+            datasets: [
+                {
+                    label: 'Período A',
+                    data: expectancyA,
+                    backgroundColor: CONFIG.CHART_COLORS.blue,
+                    borderColor: CONFIG.CHART_COLORS.blue,
+                    borderWidth: 1
+                },
+                {
+                    label: 'Período B',
+                    data: expectancyB,
+                    backgroundColor: CONFIG.CHART_COLORS.purple,
+                    borderColor: CONFIG.CHART_COLORS.purple,
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const datasetLabel = context.dataset.label || '';
+                            const value = context.parsed.y;
+                            const pattern = patterns[context.dataIndex];
+                            
+                            let count = 0;
+                            if (context.datasetIndex === 0 && patternStatsA[pattern]) {
+                                count = patternStatsA[pattern].count;
+                            } else if (context.datasetIndex === 1 && patternStatsB[pattern]) {
+                                count = patternStatsB[pattern].count;
+                            }
+                            
+                            return `${datasetLabel}: ${value.toFixed(2)}R (${count} trades)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    // beginAtZero: true, // Removido para permitir valores negativos serem bem visualizados
+                    title: {
+                        display: true,
+                        text: 'Expectativa (R)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Agrupa trades por padrão e calcula estatísticas
+ * @param {Array} trades - Lista de trades
+ * @returns {Object} - Estatísticas por padrão
+ */
+function groupTradesByPattern(trades) {
+    const patternStats = {};
+    
+    trades.forEach(trade => {
+        const pattern = trade['Padrão Brooks'];
+        if (!pattern) return;
+        
+        if (!patternStats[pattern]) {
+            patternStats[pattern] = {
+                count: 0,
+                wins: 0,
+                results: []
+            };
+        }
+        
+        patternStats[pattern].count++;
+        
+        const result = parseFloat(trade['Resultado (R)']);
+        patternStats[pattern].results.push(result);
+        
+        if (result > 0) {
+            patternStats[pattern].wins++;
+        }
+    });
+    
+    // Calcular taxa de acerto e expectativa
+    Object.keys(patternStats).forEach(pattern => {
+        const stats = patternStats[pattern];
+        if (stats.count > 0) { // Evitar divisão por zero
+            stats.winRate = stats.wins / stats.count;
+            stats.expectancy = stats.results.reduce((sum, val) => sum + val, 0) / stats.count;
+        } else {
+            stats.winRate = 0;
+            stats.expectancy = 0;
+        }
+    });
+    
+    return patternStats;
+}
+// --- FIM DO CÓDIGO ADICIONADO CONFORME ATUALIZAÇÃO ---
+```
+
+**Resumo das alterações aplicadas:**
+
+1.  **`statsData` Atualizado**: A propriedade `periodBData` foi adicionada ao objeto `statsData`.
+    ```javascript
+    const statsData = {
+        // ... outras propriedades
+        charts: {},
+        periodBData: { // Adicionado
+            trades: [],
+            dateRange: {
+                from: null,
+                to: null,
+                label: 'Nenhum período selecionado'
+            },
+            normalized: true
+        },
+    };
+    ```
+2.  **`setupEventListeners` Atualizado**: Uma chamada para `setupComparisonEvents();` foi adicionada ao final da função `setupEventListeners`.
+    ```javascript
+    function setupEventListeners() {
+        // ... outros event listeners
+        
+        // Configurar eventos da comparação de períodos // Adicionado
+        setupComparisonEvents(); // Adicionado
+    }
