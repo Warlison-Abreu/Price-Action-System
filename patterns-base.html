@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padrões Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded pattern-category">Categoria do Padrão</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="hover:text-blue-300">
+                    <i class="fas fa-home mr-1"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="bg-trading-dark text-white w-64 py-4 flex-shrink-0">
+            <div class="px-4 py-2">
+                <h2 class="text-xl font-bold mb-4">Menu Principal</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="index.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            <i class="fas fa-chart-line mr-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="new-trade.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            <i class="fas fa-plus-circle mr-2"></i>Nova Análise
+                        </a>
+                    </li>
+                    <li>
+                        <a href="trades.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            <i class="fas fa-history mr-2"></i>Histórico de Trades
+                        </a>
+                    </li>
+                    <li>
+                        <a href="statistics.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            <i class="fas fa-chart-pie mr-2"></i>Estatísticas
+                        </a>
+                    </li>
+                    <li>
+                        <a href="journal.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            <i class="fas fa-book mr-2"></i>Diário de Trading
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mt-6 px-4 py-2">
+                <h2 class="text-xl font-bold mb-4">Padrões Brooks</h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="patterns-major-trend-reversals.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            Major Trend Reversals
+                        </a>
+                    </li>
+                    <li>
+                        <a href="patterns-final-flags.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            Final Flags
+                        </a>
+                    </li>
+                    <li>
+                        <a href="patterns-breakouts.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            Breakouts
+                        </a>
+                    </li>
+                    <li>
+                        <a href="patterns-high-low.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            High/Low 2
+                        </a>
+                    </li>
+                    <li>
+                        <a href="patterns-wedges.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            Wedges
+                        </a>
+                    </li>
+                    <li>
+                        <a href="patterns-channels.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            Channels
+                        </a>
+                    </li>
+                    <li>
+                        <a href="patterns-all.html" class="block py-2 px-4 rounded hover:bg-blue-700 transition">
+                            Ver Todos...
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <h2 class="text-2xl font-bold mb-6 pattern-title">Nome do Padrão</h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Descrição do Padrão -->
+                <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Descrição</h3>
+                    <div class="pattern-description">
+                        <!-- Conteúdo específico do padrão será inserido aqui -->
+                    </div>
+                </div>
+
+                <!-- Estatísticas do Padrão -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Estatísticas</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium">Taxa de Acerto</span>
+                                <span class="text-sm font-medium pattern-win-rate">65%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="pattern-win-rate-bar bg-blue-600 h-2.5 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium">Expectativa</span>
+                                <span class="text-sm font-medium pattern-expectancy">1.3R</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="pattern-expectancy-bar bg-green-600 h-2.5 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 my-4">
+                            <div class="bg-gray-50 p-3 rounded border">
+                                <div class="text-sm text-gray-500">Trades</div>
+                                <div class="text-xl font-bold pattern-trades">124</div>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded border">
+                                <div class="text-sm text-gray-500">Fator de Lucro</div>
+                                <div class="text-xl font-bold pattern-profit-factor">2.1</div>
+                            </div>
+                        </div>
+                        
+                        <table class="min-w-full divide-y divide-gray-200 border">
+                            <thead>
+                                <tr>
+                                    <th class="py-2 px-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Contexto</th>
+                                    <th class="py-2 px-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Win Rate</th>
+                                    <th class="py-2 px-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase">Expect.</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 pattern-contexts">
+                                <!-- Os contextos serão inseridos aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Exemplos de Trades -->
+            <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-xl font-bold mb-4">Exemplos de Trades</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pattern-examples">
+                    <!-- Os exemplos serão inseridos aqui -->
+                </div>
+            </div>
+            
+            <!-- Setup Ideal -->
+            <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Setup Ideal</h3>
+                    <div class="pattern-setup">
+                        <!-- O setup ideal será inserido aqui -->
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Dicas de Execução</h3>
+                    <div class="pattern-tips">
+                        <!-- As dicas serão inseridas aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/patterns.js"></script>
+</body>
+</html>
