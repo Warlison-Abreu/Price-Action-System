@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Trades - Sistema Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded">Al Brooks Methodology</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Pesquisar..." class="bg-gray-700 text-white px-4 py-2 rounded text-sm">
+                </div>
+                <div id="current-pair" class="flex items-center space-x-2">
+                    <span class="text-sm">EUR/USD: 1.0842</span>
+                    <span class="text-green-400 text-xs">+0.12%</span>
+                </div>
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="font-bold">TR</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="bg-trading-dark text-white w-64 sidebar overflow-y-auto" id="sidebar">
+            <div class="p-4">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Menu Principal</h2>
+                    <ul class="space-y-2">
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="index.html" class="block"><i class="fas fa-chart-line mr-2"></i>Dashboard</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="register.html" class="block"><i class="fas fa-plus-circle mr-2"></i>Nova Análise</a></li>
+                        <li class="bg-blue-600 p-2 rounded"><a href="history.html" class="block"><i class="fas fa-history mr-2"></i>Histórico de Trades</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="statistics.html" class="block"><i class="fas fa-chart-pie mr-2"></i>Estatísticas</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="journal.html" class="block"><i class="fas fa-book mr-2"></i>Diário de Trading</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h2 class="text-lg font-bold mb-2">Filtros</h2>
+                    <form id="filters-form">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Período</label>
+                                <select id="period-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os dados</option>
+                                    <option value="month">Último mês</option>
+                                    <option value="3months">Últimos 3 meses</option>
+                                    <option value="6months">Últimos 6 meses</option>
+                                    <option value="year">Último ano</option>
+                                    <option value="custom">Período personalizado</option>
+                                </select>
+                            </div>
+                            
+                            <div id="custom-period" class="hidden space-y-2">
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">De:</label>
+                                    <input type="date" id="date-from" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">Até:</label>
+                                    <input type="date" id="date-to" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Par</label>
+                                <select id="pair-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os pares</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Timeframe</label>
+                                <select id="timeframe-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os timeframes</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Padrão</label>
+                                <select id="pattern-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os padrões</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Tipo</label>
+                                <select id="type-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os tipos</option>
+                                    <option value="Estudo">Estudo</option>
+                                    <option value="Simulação">Simulação</option>
+                                    <option value="Real">Real</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Resultado</label>
+                                <select id="result-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos</option>
+                                    <option value="win">Ganhos</option>
+                                    <option value="loss">Perdas</option>
+                                    <option value="be">Empates</option>
+                                </select>
+                            </div>
+                            
+                            <div class="pt-2">
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded">
+                                    <i class="fas fa-filter mr-2"></i>Aplicar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 content p-6">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Histórico de Trades</h2>
+                    <div>
+                        <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 mr-2" id="export-btn">
+                            <i class="fas fa-file-export mr-2"></i>Exportar
+                        </button>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-trade-btn">
+                            <i class="fas fa-plus mr-2"></i>Novo Trade
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resumo dos Trades -->
+                <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 border rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Total de Trades</p>
+                                    <h4 class="text-2xl font-bold" id="total-trades">0</h4>
+                                </div>
+                                <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <i class="fas fa-exchange-alt text-blue-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 border rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Ganhos</p>
+                                    <h4 class="text-2xl font-bold text-green-600" id="wins-count">0</h4>
+                                </div>
+                                <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-arrow-up text-green-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 border rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Perdas</p>
+                                    <h4 class="text-2xl font-bold text-red-600" id="losses-count">0</h4>
+                                </div>
+                                <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                                    <i class="fas fa-arrow-down text-red-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 border rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Expectativa (R)</p>
+                                    <h4 class="text-2xl font-bold" id="expectancy">0.00R</h4>
+                                </div>
+                                <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <i class="fas fa-calculator text-purple-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="text-center p-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-blue-500"></i>
+                    <p class="mt-2">Carregando dados...</p>
+                </div>
+
+                <!-- Tabela de Trades -->
+                <div id="trades-table-container" class="bg-white rounded-lg shadow-md p-4 mb-6 hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left text-sm">Data</th>
+                                    <th class="py-2 px-4 text-left text-sm">Par</th>
+                                    <th class="py-2 px-4 text-left text-sm">Padrão</th>
+                                    <th class="py-2 px-4 text-left text-sm">Contexto</th>
+                                    <th class="py-2 px-4 text-left text-sm">Direção</th>
+                                    <th class="py-2 px-4 text-left text-sm">Timeframe</th>
+                                    <th class="py-2 px-4 text-left text-sm">Tipo</th>
+                                    <th class="py-2 px-4 text-left text-sm">Resultado</th>
+                                    <th class="py-2 px-4 text-left text-sm">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trades-table">
+                                <!-- Será preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Paginação -->
+                    <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <span class="text-sm text-gray-600" id="pagination-info">Exibindo 0 de 0 trades</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="prev-page" class="px-3 py-1 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div id="page-numbers" class="flex space-x-1">
+                                <!-- Será preenchido via JavaScript -->
+                            </div>
+                            <button id="next-page" class="px-3 py-1 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300" disabled>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mensagem de Nenhum Trade Encontrado -->
+                <div id="no-trades-message" class="bg-white rounded-lg shadow-md p-6 mb-6 text-center hidden">
+                    <i class="fas fa-search text-4xl text-gray-400 mb-3"></i>
+                    <h3 class="text-lg font-bold mb-2">Nenhum trade encontrado</h3>
+                    <p class="text-gray-600">Tente ajustar os filtros ou cadastre novos trades.</p>
+                    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" onclick="window.location.href='register.html'">
+                        <i class="fas fa-plus mr-2"></i>Novo Trade
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhe do Trade -->
+    <div id="trade-detail-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Detalhes do Trade</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="trade-detail-content">
+                <!-- Será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+        <span id="toast-message">Operação realizada com sucesso!</span>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html>
