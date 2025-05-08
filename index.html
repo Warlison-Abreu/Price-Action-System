@@ -368,6 +368,142 @@
         </div>
     </div>
 
+    <!-- Modal de Personalização do Dashboard -->
+    <div id="dashboard-config-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Personalizar Dashboard</h3>
+                <button id="close-dashboard-config" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="dashboard-config-form">
+                <div class="mb-4">
+                    <h4 class="font-bold mb-2 pb-1 border-b">Cartões de Estatísticas</h4>
+                    <div class="grid grid-cols-2 gap-3" id="stats-cards-config">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-win-rate" class="mr-2" checked>
+                            <label for="show-win-rate">Taxa de Acerto</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-expectancy" class="mr-2" checked>
+                            <label for="show-expectancy">Expectativa (R)</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-profit-factor" class="mr-2" checked>
+                            <label for="show-profit-factor">Fator de Lucro</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-trades-count" class="mr-2" checked>
+                            <label for="show-trades-count">Contagem de Trades</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-avg-win" class="mr-2">
+                            <label for="show-avg-win">Ganho Médio</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-avg-loss" class="mr-2">
+                            <label for="show-avg-loss">Perda Média</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-best-pattern" class="mr-2" checked>
+                            <label for="show-best-pattern">Melhor Padrão</label>
+                        </div>
+                       <div class="flex items-center">
+                            <input type="checkbox" id="show-best-pattern" class="mr-2"> <!-- ID duplicado conforme solicitação -->
+                            <label for="show-best-pattern">Melhor Padrão</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-worst-pattern" class="mr-2">
+                            <label for="show-worst-pattern">Pior Padrão</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h4 class="font-bold mb-2 pb-1 border-b">Gráficos</h4>
+                    <div class="grid grid-cols-2 gap-3" id="charts-config">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-performance-chart" class="mr-2" checked>
+                            <label for="show-performance-chart">Gráfico de Desempenho</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-patterns-chart" class="mr-2" checked>
+                            <label for="show-patterns-chart">Desempenho por Padrão</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-timeframes-chart" class="mr-2" checked>
+                            <label for="show-timeframes-chart">Desempenho por Timeframe</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-context-chart" class="mr-2">
+                            <label for="show-context-chart">Desempenho por Contexto</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-daily-chart" class="mr-2">
+                            <label for="show-daily-chart">Desempenho Diário</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-rmultiple-chart" class="mr-2">
+                            <label for="show-rmultiple-chart">Distribuição R-Multiple</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h4 class="font-bold mb-2 pb-1 border-b">Seções</h4>
+                    <div class="grid grid-cols-2 gap-3" id="sections-config">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-recent-trades" class="mr-2" checked>
+                            <label for="show-recent-trades">Trades Recentes</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-top-patterns" class="mr-2" checked>
+                            <label for="show-top-patterns">Melhores Padrões</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-journal-entries" class="mr-2">
+                            <label for="show-journal-entries">Entradas do Diário</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="show-market-context" class="mr-2">
+                            <label for="show-market-context">Contexto de Mercado</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h4 class="font-bold mb-2 pb-1 border-b">Layout</h4>
+                    <div class="mb-3">
+                        <label class="block mb-1 text-sm">Período padrão para dashboard:</label>
+                        <select id="default-period" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                            <option value="all">Todo o histórico</option>
+                            <option value="month" selected>Último mês</option>
+                            <option value="3months">Últimos 3 meses</option>
+                            <option value="6months">Últimos 6 meses</option>
+                            <option value="year">Último ano</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block mb-1 text-sm">Tema de cores:</label>
+                        <select id="color-theme" class="w-full border border-gray-300 rounded-md px-3 py-2">
+                            <option value="default" selected>Padrão (Azul)</option>
+                            <option value="green">Verde</option>
+                            <option value="purple">Roxo</option>
+                            <option value="dark">Escuro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400" id="reset-dashboard-config">Restaurar Padrão</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Salvar Configurações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast Notification (Hidden by default) -->
     <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
         <span id="toast-message">Operação realizada com sucesso!</span>
