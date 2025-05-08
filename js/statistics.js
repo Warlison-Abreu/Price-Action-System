@@ -3001,32 +3001,4 @@ function groupTradesByPattern(trades) {
     
     return patternStats;
 }
-// --- FIM DO CÓDIGO ADICIONADO CONFORME ATUALIZAÇÃO ---
-```
 
-**Resumo das alterações aplicadas:**
-
-1.  **`statsData` Atualizado**: A propriedade `periodBData` foi adicionada ao objeto `statsData`.
-    ```javascript
-    const statsData = {
-        // ... outras propriedades
-        charts: {},
-        periodBData: { // Adicionado
-            trades: [],
-            dateRange: {
-                from: null,
-                to: null,
-                label: 'Nenhum período selecionado'
-            },
-            normalized: true
-        },
-    };
-    ```
-2.  **`setupEventListeners` Atualizado**: Uma chamada para `setupComparisonEvents();` foi adicionada ao final da função `setupEventListeners`.
-    ```javascript
-    function setupEventListeners() {
-        // ... outros event listeners
-        
-        // Configurar eventos da comparação de períodos // Adicionado
-        setupComparisonEvents(); // Adicionado
-    }
