@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Padrão - Sistema Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded">Al Brooks Methodology</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Pesquisar..." class="bg-gray-700 text-white px-4 py-2 rounded text-sm">
+                </div>
+                <div id="current-pair" class="flex items-center space-x-2">
+                    <span class="text-sm">EUR/USD: 1.0842</span>
+                    <span class="text-green-400 text-xs">+0.12%</span>
+                </div>
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="font-bold">TR</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="bg-trading-dark text-white w-64 sidebar overflow-y-auto" id="sidebar">
+            <div class="p-4">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Menu Principal</h2>
+                    <ul class="space-y-2">
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="index.html" class="block"><i class="fas fa-chart-line mr-2"></i>Dashboard</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="register.html" class="block"><i class="fas fa-plus-circle mr-2"></i>Nova Análise</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="history.html" class="block"><i class="fas fa-history mr-2"></i>Histórico de Trades</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="statistics.html" class="block"><i class="fas fa-chart-pie mr-2"></i>Estatísticas</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="journal.html" class="block"><i class="fas fa-book mr-2"></i>Diário de Trading</a></li>
+                    </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Padrões Brooks</h2>
+                    <ul class="space-y-2 text-sm patterns-list">
+                        <!-- Preenchido dinamicamente pelo JavaScript -->
+                    </ul>
+                </div>
+                
+                <div>
+                    <h2 class="text-lg font-bold mb-2">Filtros</h2>
+                    <form id="filters-form">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Período</label>
+                                <select id="period-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os dados</option>
+                                    <option value="month">Último mês</option>
+                                    <option value="3months">Últimos 3 meses</option>
+                                    <option value="6months">Últimos 6 meses</option>
+                                    <option value="year">Último ano</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Contexto</label>
+                                <select id="context-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os contextos</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Timeframe</label>
+                                <select id="timeframe-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os timeframes</option>
+                                </select>
+                            </div>
+                            
+                            <div class="pt-2">
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded">
+                                    <i class="fas fa-filter mr-2"></i>Aplicar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 content p-6">
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="text-center p-8">
+                <i class="fas fa-spinner fa-spin fa-2x text-blue-500"></i>
+                <p class="mt-2">Carregando informações do padrão...</p>
+            </div>
+
+            <!-- Pattern Detail Content -->
+            <div id="pattern-content" class="hidden">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <div class="flex items-center">
+                            <h2 class="text-2xl font-bold mr-3" id="pattern-name">Nome do Padrão</h2>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" id="pattern-category">Categoria</span>
+                        </div>
+                        <p class="text-gray-600 mt-1" id="pattern-id">ID: ABC</p>
+                    </div>
+                    <div class="flex">
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mr-2" id="export-stats-btn">
+                            <i class="fas fa-file-export mr-2"></i>Exportar Estatísticas
+                        </button>
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" id="new-trade-btn">
+                            <i class="fas fa-plus mr-2"></i>Usar este Padrão
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pattern Information -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Pattern Description -->
+                    <div class="md:col-span-2 bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-bold mb-3 pb-2 border-b">Descrição do Padrão</h3>
+                        <p class="text-gray-700 mb-4" id="pattern-description">Descrição detalhada do padrão...</p>
+                        
+                        <h4 class="font-bold mb-2">Características Principais:</h4>
+                        <ul class="list-disc pl-5 mb-4 text-gray-700" id="pattern-characteristics">
+                            <!-- Lista de características -->
+                        </ul>
+                        
+                        <h4 class="font-bold mb-2">Contexto Ideal:</h4>
+                        <p class="text-gray-700" id="pattern-ideal-context">Descrição do contexto ideal...</p>
+                    </div>
+                    
+                    <!-- Pattern Stats Overview -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-bold mb-3 pb-2 border-b">Resumo Estatístico</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-700">Total de Trades:</span>
+                                    <span class="font-bold" id="pattern-total-trades">0</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-700">Taxa de Acerto:</span>
+                                    <span class="font-bold" id="pattern-win-rate">0.0%</span>
+                                </div>
+                                <div class="bg-gray-200 rounded-full h-2.5">
+                                    <div id="pattern-win-rate-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-700">Expectativa (R):</span>
+                                    <span class="font-bold" id="pattern-expectancy">0.00R</span>
+                                </div>
+                                <div class="bg-gray-200 rounded-full h-2.5">
+                                    <div id="pattern-expectancy-bar" class="bg-green-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-700">Probabilidade Base:</span>
+                                    <span class="font-bold" id="pattern-probability">0%</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-700">Força do Padrão:</span>
+                                    <span class="font-bold px-2 py-1 rounded-full text-xs" id="pattern-strength">-</span>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-gray-700">Desempenho por Direção:</span>
+                                <div class="flex justify-between mt-2">
+                                    <div class="text-center">
+                                        <span class="text-sm text-green-600">Long</span>
+                                        <p class="font-bold" id="pattern-long-win-rate">0.0%</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <span class="text-sm text-red-600">Short</span>
+                                        <p class="font-bold" id="pattern-short-win-rate">0.0%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Visualization -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- Context Performance Chart -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="text-lg font-bold mb-4">Desempenho por Contexto</h3>
+                        <div class="chart-container h-64">
+                            <canvas id="contextPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeframe Performance Chart -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="text-lg font-bold mb-4">Desempenho por Timeframe</h3>
+                        <div class="chart-container h-64">
+                            <canvas id="timeframePerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- R-Multiple Distribution -->
+                <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                    <h3 class="text-lg font-bold mb-4">Distribuição de R-Múltiplos</h3>
+                    <div class="chart-container h-64">
+                        <canvas id="rMultipleChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Example Trades -->
+                <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold">Trades Recentes com Este Padrão</h3>
+                        <a href="#" class="text-blue-600 text-sm hover:underline" id="view-all-trades">Ver Todos</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left text-sm">Data</th>
+                                    <th class="py-2 px-4 text-left text-sm">Par</th>
+                                    <th class="py-2 px-4 text-left text-sm">Contexto</th>
+                                    <th class="py-2 px-4 text-left text-sm">Direção</th>
+                                    <th class="py-2 px-4 text-left text-sm">Timeframe</th>
+                                    <th class="py-2 px-4 text-left text-sm">Qualidade</th>
+                                    <th class="py-2 px-4 text-left text-sm">Resultado</th>
+                                    <th class="py-2 px-4 text-left text-sm">Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pattern-trades-table">
+                                <!-- Trades will be inserted here by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Related Patterns -->
+                <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                    <h3 class="text-lg font-bold mb-4">Padrões Relacionados</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="related-patterns-container">
+                        <!-- Related patterns will be inserted here by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+        <span id="toast-message">Operação realizada com sucesso!</span>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pattern-detail.js"></script>
+</body>
+</html>
