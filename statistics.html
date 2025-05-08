@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatísticas - Sistema Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded">Al Brooks Methodology</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Pesquisar..." class="bg-gray-700 text-white px-4 py-2 rounded text-sm">
+                </div>
+                <div id="current-pair" class="flex items-center space-x-2">
+                    <span class="text-sm">EUR/USD: 1.0842</span>
+                    <span class="text-green-400 text-xs">+0.12%</span>
+                </div>
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="font-bold">TR</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="bg-trading-dark text-white w-64 sidebar overflow-y-auto" id="sidebar">
+            <div class="p-4">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Menu Principal</h2>
+                    <ul class="space-y-2">
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="index.html" class="block"><i class="fas fa-chart-line mr-2"></i>Dashboard</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="register.html" class="block"><i class="fas fa-plus-circle mr-2"></i>Nova Análise</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="history.html" class="block"><i class="fas fa-history mr-2"></i>Histórico de Trades</a></li>
+                        <li class="bg-blue-600 p-2 rounded"><a href="statistics.html" class="block"><i class="fas fa-chart-pie mr-2"></i>Estatísticas</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="journal.html" class="block"><i class="fas fa-book mr-2"></i>Diário de Trading</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h2 class="text-lg font-bold mb-2">Filtros</h2>
+                    <form id="filters-form">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Período</label>
+                                <select id="period-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os dados</option>
+                                    <option value="month">Último mês</option>
+                                    <option value="3months">Últimos 3 meses</option>
+                                    <option value="6months">Últimos 6 meses</option>
+                                    <option value="year">Último ano</option>
+                                    <option value="custom">Período personalizado</option>
+                                </select>
+                            </div>
+                            
+                            <div id="custom-period" class="hidden space-y-2">
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">De:</label>
+                                    <input type="date" id="date-from" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">Até:</label>
+                                    <input type="date" id="date-to" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Par</label>
+                                <select id="pair-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os pares</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Timeframe</label>
+                                <select id="timeframe-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os timeframes</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Tipo</label>
+                                <select id="type-filter" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                                    <option value="all">Todos os tipos</option>
+                                    <option value="Estudo">Estudo</option>
+                                    <option value="Simulação">Simulação</option>
+                                    <option value="Real">Real</option>
+                                </select>
+                            </div>
+                            
+                            <div class="pt-2">
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded">
+                                    <i class="fas fa-filter mr-2"></i>Aplicar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 content p-6">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Análise Estatística</h2>
+                    <div>
+                        <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 mr-2" id="print-btn">
+                            <i class="fas fa-print mr-2"></i>Imprimir
+                        </button>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="export-btn">
+                            <i class="fas fa-file-export mr-2"></i>Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="text-center p-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-blue-500"></i>
+                    <p class="mt-2">Carregando análise estatística...</p>
+                </div>
+
+                <!-- Content container (hidden until loaded) -->
+                <div id="stats-container" class="hidden">
+                    <!-- Estatísticas Resumidas -->
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                        <h3 class="text-lg font-bold mb-4">Resumo de Desempenho</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Total de Trades</p>
+                                        <h4 class="text-2xl font-bold" id="total-trades">0</h4>
+                                    </div>
+                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <i class="fas fa-exchange-alt text-blue-600"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Taxa de Acerto</p>
+                                        <h4 class="text-2xl font-bold" id="win-rate">0.0%</h4>
+                                    </div>
+                                    <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                        <i class="fas fa-percentage text-green-600"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Expectativa (R)</p>
+                                        <h4 class="text-2xl font-bold" id="expectancy">0.00</h4>
+                                    </div>
+                                    <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                        <i class="fas fa-calculator text-purple-600"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Fator de Lucro</p>
+                                        <h4 class="text-2xl font-bold" id="profit-factor">0.00</h4>
+                                    </div>
+                                    <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                                        <i class="fas fa-coins text-yellow-600"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm text-gray-500 mb-2">Distribuição de Trades</p>
+                                        <div class="flex space-x-2">
+                                            <div>
+                                                <span class="block text-sm font-medium text-green-600" id="wins-count">0</span>
+                                                <span class="text-xs text-gray-500">Ganhos</span>
+                                            </div>
+                                            <div class="h-8 border-l"></div>
+                                            <div>
+                                                <span class="block text-sm font-medium text-red-600" id="losses-count">0</span>
+                                                <span class="text-xs text-gray-500">Perdas</span>
+                                            </div>
+                                            <div class="h-8 border-l"></div>
+                                            <div>
+                                                <span class="block text-sm font-medium text-blue-600" id="be-count">0</span>
+                                                <span class="text-xs text-gray-500">Empates</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-24 h-24">
+                                        <canvas id="tradesDistributionChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm text-gray-500 mb-2">Valores R Médios</p>
+                                        <div class="flex space-x-2">
+                                            <div>
+                                                <span class="block text-sm font-medium text-green-600" id="avg-win">+0.00R</span>
+                                                <span class="text-xs text-gray-500">Média Ganhos</span>
+                                            </div>
+                                            <div class="h-8 border-l"></div>
+                                            <div>
+                                                <span class="block text-sm font-medium text-red-600" id="avg-loss">-0.00R</span>
+                                                <span class="text-xs text-gray-500">Média Perdas</span>
+                                            </div>
+                                            <div class="h-8 border-l"></div>
+                                            <div>
+                                                <span class="block text-sm font-medium" id="best-trade">+0.00R</span>
+                                                <span class="text-xs text-gray-500">Melhor Trade</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-24 h-24">
+                                        <canvas id="rValuesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos de Evolução -->
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                        <h3 class="text-lg font-bold mb-4">Evolução ao Longo do Tempo</h3>
+                        
+                        <div class="flex mb-3">
+                            <div class="flex-1 text-center">
+                                <button class="px-3 py-1 text-sm rounded bg-blue-600 text-white" data-period="week">Semana</button>
+                                <button class="px-3 py-1 text-sm rounded bg-gray-200" data-period="month">Mês</button>
+                                <button class="px-3 py-1 text-sm rounded bg-gray-200" data-period="quarter">Trimestre</button>
+                                <button class="px-3 py-1 text-sm rounded bg-gray-200" data-period="year">Ano</button>
+                                <button class="px-3 py-1 text-sm rounded bg-gray-200" data-period="all">Todos</button>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container h-64">
+                            <canvas id="evolutionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Desempenho por Padrão -->
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-6" id="patterns">
+                        <h3 class="text-lg font-bold mb-4">Desempenho por Padrão Brooks</h3>
+                        
+                        <div class="mb-4 flex flex-wrap gap-2">
+                            <button class="px-3 py-1 text-sm rounded bg-blue-600 text-white" data-sort="expectancy">Expectativa</button>
+                            <button class="px-3 py-1 text-sm rounded bg-gray-200" data-sort="winrate">Taxa de Acerto</button>
+                            <button class="px-3 py-1 text-sm rounded bg-gray-200" data-sort="trades">Volume</button>
+                            <button class="px-3 py-1 text-sm rounded bg-gray-200" data-sort="alpha">Alfabética</button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="py-2 px-4 text-left text-sm">Padrão</th>
+                                        <th class="py-2 px-4 text-left text-sm">Trades</th>
+                                        <th class="py-2 px-4 text-left text-sm">Taxa de Acerto</th>
+                                        <th class="py-2 px-4 text-left text-sm">Expectativa (R)</th>
+                                        <th class="py-2 px-4 text-left text-sm">Média de Ganhos</th>
+                                        <th class="py-2 px-4 text-left text-sm">Média de Perdas</th>
+                                        <th class="py-2 px-4 text-left text-sm">Desvio Padrão</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="patterns-table">
+                                    <tr>
+                                        <td colspan="7" class="py-4 text-center text-gray-500">Carregando dados...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-md font-bold mb-3">Top 10 Padrões por Expectativa</h4>
+                                <div class="chart-container h-80">
+                                    <canvas id="topPatternsChart"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-bold mb-3">Taxa de Acerto x Volume</h4>
+                                <div class="chart-container h-80">
+                                    <canvas id="patternsScatterChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matriz de Probabilidade -->
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                        <h3 class="text-lg font-bold mb-4">Matriz de Probabilidade: Padrão x Contexto</h3>
+                        
+                        <div class="mb-4 flex flex-wrap gap-2">
+                            <button class="px-3 py-1 text-sm rounded bg-blue-600 text-white" data-matrix="winrate">Taxa de Acerto</button>
+                            <button class="px-3 py-1 text-sm rounded bg-gray-200" data-matrix="expectancy">Expectativa</button>
+                            <button class="px-3 py-1 text-sm rounded bg-gray-200" data-matrix="volume">Volume</button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <div id="probability-matrix" class="min-w-full pb-4">
+                                <p class="text-center text-gray-500 py-4">Carregando matriz de probabilidade...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Análise por Contexto e Ciclo -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <h3 class="text-lg font-bold mb-4">Desempenho por Contexto</h3>
+                            <div class="chart-container h-80">
+                                <canvas id="contextPerformanceChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow-md p-4">
+                            <h3 class="text-lg font-bold mb-4">Desempenho por Ciclo de Mercado</h3>
+                            <div class="chart-container h-80">
+                                <canvas id="cyclePerformanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Análise Comparativa -->
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                        <h3 class="text-lg font-bold mb-4">Análise Comparativa</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <h4 class="text-md font-bold mb-3">Por Par de Moedas</h4>
+                                <div class="chart-container h-80">
+                                    <canvas id="pairsComparisonChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-md font-bold mb-3">Por Timeframe</h4>
+                                <div class="chart-container h-80">
+                                    <canvas id="timeframeComparisonChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-md font-bold mb-3">Por Tipo de Atividade</h4>
+                                <div class="chart-container h-80">
+                                    <canvas id="activityComparisonChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recomendações de Otimização -->
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                        <h3 class="text-lg font-bold mb-4">Recomendações de Otimização</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="border-l-4 border-green-500 pl-4 py-2">
+                                <h4 class="font-bold text-green-600 mb-2">Pontos Fortes</h4>
+                                <ul id="strengths-list" class="text-sm space-y-2">
+                                    <li><i class="fas fa-spinner fa-spin mr-2"></i>Analisando dados...</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="border-l-4 border-red-500 pl-4 py-2">
+                                <h4 class="font-bold text-red-600 mb-2">Áreas para Melhoria</h4>
+                                <ul id="improvements-list" class="text-sm space-y-2">
+                                    <li><i class="fas fa-spinner fa-spin mr-2"></i>Analisando dados...</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <h4 class="font-bold text-blue-600 mb-2"><i class="fas fa-lightbulb mr-2"></i>Próximos Passos Recomendados</h4>
+                            <p id="recommendations-text" class="text-sm text-gray-700">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>Gerando recomendações personalizadas...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification (Hidden by default) -->
+    <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+        <span id="toast-message">Operação realizada com sucesso!</span>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/statistics.js"></script>
+</body>
+</html>

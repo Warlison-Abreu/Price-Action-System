@@ -1,0 +1,222 @@
+/* Sistema de Quantificação Price Action Brooks - Estilos principais */
+
+/* Cores personalizadas */
+.bg-trading-dark {
+    background-color: #1E293B;
+}
+
+/* Layout principal */
+.sidebar {
+    height: calc(100vh - 4rem);
+    transition: width 0.3s ease;
+}
+
+.content {
+    height: calc(100vh - 4rem);
+    overflow-y: auto;
+}
+
+/* Gráficos */
+.chart-container {
+    height: 300px;
+    position: relative;
+}
+
+/* Candlesticks estilizados para visualizações */
+.candlestick {
+    display: inline-block;
+    width: 8px;
+    margin: 0 1px;
+}
+
+.candlestick-bull {
+    background-color: #10b981;
+}
+
+.candlestick-bear {
+    background-color: #ef4444;
+}
+
+/* Cards de setup */
+.setup-card {
+    transition: all 0.3s ease;
+}
+
+.setup-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Animações e transições */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Estilos para tabelas */
+table th {
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    background-color: #f3f4f6;
+    z-index: 10;
+}
+
+table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Badges de direção */
+.badge-long {
+    color: #10b981;
+    background-color: rgba(16, 185, 129, 0.1);
+    padding: 2px 8px;
+    border-radius: 9999px;
+}
+
+.badge-short {
+    color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.1);
+    padding: 2px 8px;
+    border-radius: 9999px;
+}
+
+/* Estilos para formulários */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Estilos para o modal */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+}
+
+/* Toast notifications */
+#toast {
+    z-index: 1000;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        z-index: 50;
+        width: 16rem;
+        transition: left 0.3s ease;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+    
+    .mobile-menu-btn {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-menu-btn {
+        display: none;
+    }
+}
+
+/* Loading spinner */
+.spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 3px solid #3b82f6;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Matrix heatmap styles */
+.heatmap-cell {
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e5e7eb;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.05);
+    z-index: 10;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Quality indicators */
+.quality-a {
+    border-left: 4px solid #10b981;
+}
+
+.quality-b {
+    border-left: 4px solid #f59e0b;
+}
+
+.quality-c {
+    border-left: 4px solid #ef4444;
+}
+
+/* Expectation color indicators */
+.exp-high {
+    color: #10b981;
+}
+
+.exp-medium {
+    color: #f59e0b;
+}
+
+.exp-low {
+    color: #ef4444;
+}
+
+/* Print styles */
+@media print {
+    .sidebar, .no-print {
+        display: none;
+    }
+    
+    .content {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    body {
+        background-color: white;
+        font-size: 12pt;
+    }
+    
+    .chart-container {
+        page-break-inside: avoid;
+        height: 400px;
+    }
+}

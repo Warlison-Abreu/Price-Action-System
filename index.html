@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Quantificação Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded">Al Brooks Methodology</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Pesquisar..." class="bg-gray-700 text-white px-4 py-2 rounded text-sm">
+                </div>
+                <div id="current-pair" class="flex items-center space-x-2">
+                    <span class="text-sm">EUR/USD: 1.0842</span>
+                    <span class="text-green-400 text-xs">+0.12%</span>
+                </div>
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="font-bold">TR</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="bg-trading-dark text-white w-64 sidebar overflow-y-auto" id="sidebar">
+            <div class="p-4">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Menu Principal</h2>
+                    <ul class="space-y-2">
+                        <li class="bg-blue-600 p-2 rounded"><a href="index.html" class="block"><i class="fas fa-chart-line mr-2"></i>Dashboard</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="register.html" class="block"><i class="fas fa-plus-circle mr-2"></i>Nova Análise</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="history.html" class="block"><i class="fas fa-history mr-2"></i>Histórico de Trades</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="statistics.html" class="block"><i class="fas fa-chart-pie mr-2"></i>Estatísticas</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="journal.html" class="block"><i class="fas fa-book mr-2"></i>Diário de Trading</a></li>
+                    </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Padrões Brooks</h2>
+                    <ul class="space-y-2 text-sm patterns-list">
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Major Trend Reversals</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Final Flags</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Breakouts</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">High/Low 2</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Wedges</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Channels</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Ver Todos...</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h2 class="text-lg font-bold mb-2">Pares de Moedas</h2>
+                    <ul class="space-y-2 text-sm pairs-list">
+                        <li class="flex justify-between items-center hover:bg-gray-700 p-2 rounded">
+                            <a href="#" class="block">EUR/USD</a>
+                            <span class="text-green-400">+0.12%</span>
+                        </li>
+                        <li class="flex justify-between items-center hover:bg-gray-700 p-2 rounded">
+                            <a href="#" class="block">GBP/USD</a>
+                            <span class="text-red-400">-0.08%</span>
+                        </li>
+                        <li class="flex justify-between items-center hover:bg-gray-700 p-2 rounded">
+                            <a href="#" class="block">USD/JPY</a>
+                            <span class="text-green-400">+0.25%</span>
+                        </li>
+                        <li class="flex justify-between items-center hover:bg-gray-700 p-2 rounded">
+                            <a href="#" class="block">AUD/USD</a>
+                            <span class="text-red-400">-0.15%</span>
+                        </li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Ver Todos...</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 content p-6">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Dashboard Principal</h2>
+                    <div>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-trade-btn">
+                            <i class="fas fa-plus mr-2"></i>Novo Registro
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="text-center p-4 hidden">
+                    <i class="fas fa-spinner fa-spin fa-2x text-blue-500"></i>
+                    <p class="mt-2">Carregando dados...</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" id="stats-cards">
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Taxa de Acerto</p>
+                                <h3 class="text-xl font-bold" id="win-rate">--.--%</h3>
+                            </div>
+                            <div class="bg-green-100 p-2 rounded-full">
+                                <i class="fas fa-chart-line text-green-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-green-500 text-sm"><i class="fas fa-arrow-up mr-1"></i><span id="win-rate-change">--.--%</span> este mês</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Fator de Lucro</p>
+                                <h3 class="text-xl font-bold" id="profit-factor">-.-</h3>
+                            </div>
+                            <div class="bg-blue-100 p-2 rounded-full">
+                                <i class="fas fa-coins text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-green-500 text-sm"><i class="fas fa-arrow-up mr-1"></i><span id="profit-factor-change">-.-</span> este mês</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Expectativa (R)</p>
+                                <h3 class="text-xl font-bold" id="expectancy">-.-R</h3>
+                            </div>
+                            <div class="bg-purple-100 p-2 rounded-full">
+                                <i class="fas fa-calculator text-purple-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-red-500 text-sm"><i class="fas fa-arrow-down mr-1"></i><span id="expectancy-change">-.-R</span> este mês</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Trades Esta Semana</p>
+                                <h3 class="text-xl font-bold" id="trades-week-count">-</h3>
+                            </div>
+                            <div class="bg-yellow-100 p-2 rounded-full">
+                                <i class="fas fa-exchange-alt text-yellow-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-gray-500 text-sm"><span id="wins-week-count">-</span> lucro / <span id="losses-week-count">-</span> perda</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="text-lg font-bold mb-4">Desempenho por Padrão Brooks</h3>
+                        <div class="chart-container">
+                            <canvas id="patternPerformanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="text-lg font-bold mb-4">Resultado por Ciclo de Mercado</h3>
+                        <div class="chart-container">
+                            <canvas id="marketCycleChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Trades Table -->
+                <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold">Trades Recentes</h3>
+                        <a href="history.html" class="text-blue-600 text-sm hover:underline">Ver Todos</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 text-left text-sm">Data</th>
+                                    <th class="py-2 px-4 text-left text-sm">Par</th>
+                                    <th class="py-2 px-4 text-left text-sm">Padrão</th>
+                                    <th class="py-2 px-4 text-left text-sm">Direção</th>
+                                    <th class="py-2 px-4 text-left text-sm">Timeframe</th>
+                                    <th class="py-2 px-4 text-left text-sm">Resultado</th>
+                                    <th class="py-2 px-4 text-left text-sm">R-múltiplo</th>
+                                    <th class="py-2 px-4 text-left text-sm">Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-trades-table">
+                                <tr>
+                                    <td colspan="8" class="py-4 text-center text-gray-500">Carregando dados...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Setup Performance Cards -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold">Desempenho dos Setups</h3>
+                        <a href="statistics.html#patterns" class="text-blue-600 text-sm hover:underline">Ver Todos</a>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="setup-cards">
+                        <!-- Setup cards will be dynamically added here -->
+                        <div class="setup-card bg-white rounded-lg shadow-md p-4">
+                            <p class="text-center text-gray-500">Carregando dados...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Trade Modal (Hidden by default) -->
+    <div id="newTradeModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-3xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Novo Registro de Trade</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="trade-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Par de Moedas</label>
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="pair" name="pair" required>
+                            <option value="">Selecione o par</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Timeframe</label>
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="timeframe" name="timeframe" required>
+                            <option value="">Selecione o timeframe</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Atividade</label>
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="activity-type" name="activity-type" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="Estudo">Estudo</option>
+                            <option value="Simulação">Simulação</option>
+                            <option value="Real">Real</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ciclo de Mercado</label>
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="market-cycle" name="market-cycle" required>
+                            <option value="">Selecione o ciclo</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Padrão Brooks</label>
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="pattern" name="pattern" required>
+                            <option value="">Selecione o padrão</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contexto de Mercado</label>
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="context" name="context" required>
+                            <option value="">Selecione o contexto</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Força do Contexto</label>
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="context-strength" name="context-strength" required>
+                            <option value="">Selecione a força</option>
+                            <option value="Forte">Forte</option>
+                            <option value="Moderado">Moderado</option>
+                            <option value="Fraco">Fraco</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Qualidade do Setup</label>
+                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="setup-quality" name="setup-quality" required>
+                            <option value="">Selecione a qualidade</option>
+                            <option value="A">A (Excelente)</option>
+                            <option value="B">B (Bom)</option>
+                            <option value="C">C (Médio)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Direção</label>
+                        <div class="flex space-x-4">
+                            <div class="flex items-center">
+                                <input type="radio" name="direction" id="long" value="Long" class="mr-2" required>
+                                <label for="long" class="text-green-600">Long</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" name="direction" id="short" value="Short" class="mr-2">
+                                <label for="short" class="text-red-600">Short</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Preço de Entrada</label>
+                        <input type="number" step="0.00001" class="w-full border border-gray-300 rounded-md px-3 py-2" id="entry-price" name="entry-price" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Stop Loss</label>
+                        <input type="number" step="0.00001" class="w-full border border-gray-300 rounded-md px-3 py-2" id="stop-loss" name="stop-loss" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Take Profit</label>
+                        <input type="number" step="0.00001" class="w-full border border-gray-300 rounded-md px-3 py-2" id="take-profit" name="take-profit" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Resultado (R)</label>
+                        <input type="number" step="0.01" class="w-full border border-gray-300 rounded-md px-3 py-2" id="result" name="result" required placeholder="Ex: +2.5">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Justificativa da Entrada</label>
+                        <textarea class="w-full border border-gray-300 rounded-md px-3 py-2" rows="2" id="entry-reason" name="entry-reason"></textarea>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lições Aprendidas</label>
+                        <textarea class="w-full border border-gray-300 rounded-md px-3 py-2" rows="2" id="lessons" name="lessons"></textarea>
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Anexar Screenshot</label>
+                        <div id="screenshot-upload" class="border border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer">
+                            <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                            <p class="text-sm text-gray-500">Arraste uma imagem ou clique para fazer upload</p>
+                            <input type="file" id="screenshot-input" class="hidden" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400" id="cancel-btn">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Salvar Registro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification (Hidden by default) -->
+    <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+        <span id="toast-message">Operação realizada com sucesso!</span>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

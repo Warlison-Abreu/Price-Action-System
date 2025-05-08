@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Trade - Sistema Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded">Al Brooks Methodology</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Pesquisar..." class="bg-gray-700 text-white px-4 py-2 rounded text-sm">
+                </div>
+                <div id="current-pair" class="flex items-center space-x-2">
+                    <span class="text-sm">EUR/USD: 1.0842</span>
+                    <span class="text-green-400 text-xs">+0.12%</span>
+                </div>
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="font-bold">TR</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="bg-trading-dark text-white w-64 sidebar overflow-y-auto" id="sidebar">
+            <div class="p-4">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Menu Principal</h2>
+                    <ul class="space-y-2">
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="index.html" class="block"><i class="fas fa-chart-line mr-2"></i>Dashboard</a></li>
+                        <li class="bg-blue-600 p-2 rounded"><a href="register.html" class="block"><i class="fas fa-plus-circle mr-2"></i>Nova Análise</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="history.html" class="block"><i class="fas fa-history mr-2"></i>Histórico de Trades</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="statistics.html" class="block"><i class="fas fa-chart-pie mr-2"></i>Estatísticas</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="journal.html" class="block"><i class="fas fa-book mr-2"></i>Diário de Trading</a></li>
+                    </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Padrões Brooks</h2>
+                    <ul class="space-y-2 text-sm patterns-list">
+                        <!-- Preenchido dinamicamente pelo JavaScript -->
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Carregando...</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h2 class="text-lg font-bold mb-2">Pares de Moedas</h2>
+                    <ul class="space-y-2 text-sm pairs-list">
+                        <!-- Preenchido dinamicamente pelo JavaScript -->
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block">Carregando...</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 content p-6">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Registro de Trade</h2>
+                    <div>
+                        <button class="bg-gray-300 text-gray-800 mr-2 px-4 py-2 rounded-lg hover:bg-gray-400" id="clear-form-btn">
+                            <i class="fas fa-eraser mr-2"></i>Limpar
+                        </button>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="save-trade-btn">
+                            <i class="fas fa-save mr-2"></i>Salvar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form Container -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div id="loading-indicator" class="text-center p-4">
+                        <i class="fas fa-spinner fa-spin fa-2x text-blue-500"></i>
+                        <p class="mt-2">Carregando dados...</p>
+                    </div>
+
+                    <form id="trade-form" class="hidden">
+                        <!-- Informações Básicas -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold mb-3 pb-2 border-b">Informações Básicas</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Data e Hora</label>
+                                    <input type="datetime-local" class="w-full border border-gray-300 rounded-md px-3 py-2" id="datetime" name="datetime" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Par de Moedas</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="pair" name="pair" required>
+                                        <option value="">Selecione o par</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Timeframe</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="timeframe" name="timeframe" required>
+                                        <option value="">Selecione o timeframe</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Atividade</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="activity-type" name="activity-type" required>
+                                        <option value="">Selecione o tipo</option>
+                                        <option value="Estudo">Estudo</option>
+                                        <option value="Simulação">Simulação</option>
+                                        <option value="Real">Real</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Direção</label>
+                                    <div class="flex space-x-4 mt-2">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="direction" id="long" value="Long" class="mr-2" required>
+                                            <label for="long" class="text-green-600">Long</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="radio" name="direction" id="short" value="Short" class="mr-2">
+                                            <label for="short" class="text-red-600">Short</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Análise Técnica -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold mb-3 pb-2 border-b">Análise Técnica</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Padrão Brooks</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="pattern" name="pattern" required>
+                                        <option value="">Selecione o padrão</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Contexto de Mercado</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="context" name="context" required>
+                                        <option value="">Selecione o contexto</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Força do Contexto</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="context-strength" name="context-strength" required>
+                                        <option value="">Selecione a força</option>
+                                        <option value="Forte">Forte</option>
+                                        <option value="Moderado">Moderado</option>
+                                        <option value="Fraco">Fraco</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Ciclo de Mercado</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="market-cycle" name="market-cycle" required>
+                                        <option value="">Selecione o ciclo</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Qualidade do Setup</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="setup-quality" name="setup-quality" required>
+                                        <option value="">Selecione a qualidade</option>
+                                        <option value="A">A (Excelente)</option>
+                                        <option value="B">B (Bom)</option>
+                                        <option value="C">C (Médio)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Justificativa da Entrada</label>
+                                <textarea class="w-full border border-gray-300 rounded-md px-3 py-2" rows="3" id="entry-reason" name="entry-reason"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Detalhes da Operação -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold mb-3 pb-2 border-b">Detalhes da Operação</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Preço de Entrada</label>
+                                    <input type="number" step="0.00001" class="w-full border border-gray-300 rounded-md px-3 py-2" id="entry-price" name="entry-price" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Stop Loss</label>
+                                    <input type="number" step="0.00001" class="w-full border border-gray-300 rounded-md px-3 py-2" id="stop-loss" name="stop-loss" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Take Profit</label>
+                                    <input type="number" step="0.00001" class="w-full border border-gray-300 rounded-md px-3 py-2" id="take-profit" name="take-profit" required>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Resultado (R)</label>
+                                    <input type="number" step="0.01" class="w-full border border-gray-300 rounded-md px-3 py-2" id="result" name="result" required placeholder="Ex: +2.5">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="flex justify-between mb-1">
+                                    <label class="block text-sm font-medium text-gray-700">Risk-Reward Ratio</label>
+                                    <span id="risk-reward" class="text-sm font-medium text-blue-600">1:1.0</span>
+                                </div>
+                                <div class="bg-gray-200 rounded-full h-2.5">
+                                    <div id="risk-reward-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lições e Documentação -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold mb-3 pb-2 border-b">Lições e Documentação</h3>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Lições Aprendidas</label>
+                                <textarea class="w-full border border-gray-300 rounded-md px-3 py-2" rows="3" id="lessons" name="lessons"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Anexar Screenshot</label>
+                                <div id="screenshot-upload" class="border border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer">
+                                    <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                                    <p class="text-sm text-gray-500">Arraste uma imagem ou clique para fazer upload</p>
+                                    <input type="file" id="screenshot-input" class="hidden" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Recomendações e Dicas -->
+                <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                    <h3 class="text-lg font-bold mb-3">Dicas para Registro Eficaz</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <h4 class="font-bold text-blue-600 mb-2"><i class="fas fa-lightbulb mr-2"></i>Padrões Brooks</h4>
+                            <p class="text-sm text-gray-600">Identifique corretamente o padrão principal. Se houver múltiplos padrões, escolha o mais influente na sua decisão.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-blue-600 mb-2"><i class="fas fa-balance-scale mr-2"></i>Qualidade do Setup</h4>
+                            <p class="text-sm text-gray-600">Seja honesto na classificação. Um setup A deve ter padrão perfeito, contexto ideal e forte confluência.</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-blue-600 mb-2"><i class="fas fa-pen mr-2"></i>Lições Aprendidas</h4>
+                            <p class="text-sm text-gray-600">Documente tanto os acertos quanto os erros. Registre não apenas o quê aconteceu, mas também o porquê.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification (Hidden by default) -->
+    <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+        <span id="toast-message">Operação realizada com sucesso!</span>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/register.js"></script>
+</body>
+</html>
