@@ -6,7 +6,7 @@
 const CONFIG = {
     // URL base para a API do Google Apps Script
     // IMPORTANTE: Você deve substituir pela URL da sua Web App após publicá-la
-    API_BASE_URL: 'https://script.google.com/macros/s/AKfycbynUKEE2I3J4CP-eI3aTFN03Db_EwrGhy7wLp7I0T-JtXFJuRcIq48UPLo9iOGfmZhwAQ/exec',
+    API_BASE_URL: 'https://script.google.com/macros/s/AKfycbz2LVB2K8qyq_N0ISifebe7_Bx1D0589t1l7uthD6pZ95YapbaSYLaf3GR6HFkaR8qXOQ/exec',
     
     // Limites e configurações
     RECENT_TRADES_LIMIT: 5,
