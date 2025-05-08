@@ -399,7 +399,164 @@
                             </p>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Comparação de Períodos -->
+                    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold">Comparação de Períodos</h3>
+                            <button id="configure-comparison-btn" class="bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700">
+                                <i class="fas fa-cog mr-1"></i>Configurar
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-bold" id="period-a-title">Período A (Atual)</h4>
+                                    <span class="text-sm text-gray-500" id="period-a-date-range">Todo o histórico</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 mb-3">
+                                    <div>
+                                        <p class="text-xs text-gray-500">Taxa de Acerto</p>
+                                        <p class="font-bold text-lg" id="period-a-win-rate">0.0%</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Trades</p>
+                                        <p class="font-bold text-lg" id="period-a-trades-count">0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Expectativa</p>
+                                        <p class="font-bold text-lg" id="period-a-expectancy">0.00R</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Fator de Lucro</p>
+                                        <p class="font-bold text-lg" id="period-a-profit-factor">0.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-bold" id="period-b-title">Período B (Comparação)</h4>
+                                    <span class="text-sm text-gray-500" id="period-b-date-range">Nenhum período selecionado</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 mb-3" id="period-b-stats">
+                                    <div>
+                                        <p class="text-xs text-gray-500">Taxa de Acerto</p>
+                                        <p class="font-bold text-lg" id="period-b-win-rate">0.0%</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Trades</p>
+                                        <p class="font-bold text-lg" id="period-b-trades-count">0</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Expectativa</p>
+                                        <p class="font-bold text-lg" id="period-b-expectancy">0.00R</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500">Fator de Lucro</p>
+                                        <p class="font-bold text-lg" id="period-b-profit-factor">0.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold mb-2">Comparação de Padrões</h4>
+                                <div class="chart-container h-64">
+                                    <canvas id="periodsComparisonChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold mb-2">Diferença entre Períodos</h4>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full">
+                                        <thead>
+                                            <tr class="bg-gray-100">
+                                                <th class="py-2 px-4 text-left text-sm">Métrica</th>
+                                                <th class="py-2 px-4 text-left text-sm">Período A</th>
+                                                <th class="py-2 px-4 text-left text-sm">Período B</th>
+                                                <th class="py-2 px-4 text-left text-sm">Diferença</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="comparison-table">
+                                            <!-- Será preenchido via JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal de Configuração de Comparação -->
+                    <div id="comparison-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+                        <div class="relative top-20 mx-auto p-5 border w-full max-w-xl shadow-lg rounded-md bg-white">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold">Configurar Comparação de Períodos</h3>
+                                <button id="close-comparison-modal" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <form id="comparison-form">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Período A (Atual)</label>
+                                    <p class="text-sm text-gray-500 mb-2">Este é o período atual com base nos filtros aplicados.</p>
+                                    <div class="flex">
+                                        <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" id="period-a-display" readonly>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Período B (Comparação)</label>
+                                    <select class="w-full border border-gray-300 rounded-md px-3 py-2 mb-2" id="period-b-type">
+                                        <option value="preset">Período Predefinido</option>
+                                        <option value="custom">Período Personalizado</option>
+                                    </select>
+                                    
+                                    <div id="preset-period-container">
+                                        <select class="w-full border border-gray-300 rounded-md px-3 py-2" id="preset-period">
+                                            <option value="last-month">Último Mês</option>
+                                            <option value="last-3-months">Últimos 3 Meses</option>
+                                            <option value="last-6-months">Últimos 6 Meses</option>
+                                            <option value="last-year">Último Ano</option>
+                                            <option value="previous-period">Período Anterior Equivalente</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div id="custom-period-container" class="hidden">
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-xs text-gray-500 mb-1">De:</label>
+                                                <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2" id="period-b-from">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-gray-500 mb-1">Até:</label>
+                                                <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2" id="period-b-to">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Opções de Comparação</label>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="normalize-data" class="mr-2" checked>
+                                        <label for="normalize-data" class="text-sm text-gray-700">Normalizar dados pelo número de trades</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400" id="cancel-comparison-btn">Cancelar</button>
+                                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Aplicar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div> <!-- Fim de stats-container -->
             </div>
         </div>
     </div>
