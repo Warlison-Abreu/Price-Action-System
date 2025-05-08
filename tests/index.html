@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testes Automatizados - Sistema Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded">Testes Automatizados</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="../index.html" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar ao Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto py-8 px-4">
+        <!-- Cabeçalho -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold">Testes Automatizados</h2>
+                <p class="text-gray-600">Verificação de funcionalidades e integridade do sistema</p>
+            </div>
+            <button id="run-tests-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                <i class="fas fa-play mr-2"></i>Executar Testes
+            </button>
+        </div>
+
+        <!-- Resultados dos Testes -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-lg font-bold mb-4">Resultados</h3>
+            <div id="test-results">
+                <div class="text-center p-8 text-gray-500">
+                    Clique em "Executar Testes" para iniciar a bateria de testes
+                </div>
+            </div>
+        </div>
+
+        <!-- Console de Teste -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">Console de Testes</h3>
+                <button id="clear-console-btn" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="bg-gray-900 text-white font-mono text-sm p-4 rounded-lg h-96 overflow-y-auto" id="test-console">
+                &gt; Sistema de testes carregado. Aguardando execução...
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+        <span id="toast-message">Operação realizada com sucesso!</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script>
+        // Override do console.log para capturar no console de testes
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        console.log = function() {
+            // Chamar o console.log original
+            originalConsoleLog.apply(console, arguments);
+            
+            // Adicionar ao console de testes
+            appendToTestConsole(Array.from(arguments).join(' '), 'log');
+        };
+        
+        console.error = function() {
+            // Chamar o console.error original
+            originalConsoleError.apply(console, arguments);
+            
+            // Adicionar ao console de testes
+            appendToTestConsole(Array.from(arguments).join(' '), 'error');
+        };
+        
+        function appendToTestConsole(message, type) {
+            const consoleElement = document.getElementById('test-console');
+            if (consoleElement) {
+                const line = document.createElement('div');
+                line.className = type === 'error' ? 'text-red-400' : '';
+                
+                // Formatar mensagem
+                if (type === 'error') {
+                    line.textContent = '✗ ' + message;
+                } else {
+                    line.textContent = '> ' + message;
+                }
+                
+                consoleElement.appendChild(line);
+                
+                // Rolar para o final
+                consoleElement.scrollTop = consoleElement.scrollHeight;
+            }
+        }
+        
+        // Limpar console
+        document.getElementById('clear-console-btn').addEventListener('click', function() {
+            const consoleElement = document.getElementById('test-console');
+            if (consoleElement) {
+                consoleElement.innerHTML = '&gt; Console limpo. Pronto para novos testes...';
+            }
+        });
+        
+        // Função para calcular estatísticas (simulada para testes)
+        function calculateStatistics(trades) {
+            // Total de trades
+            const totalTrades = trades.length;
+            
+            // Calcular trades vencedores e perdedores
+            const winsCount = trades.filter(trade => parseFloat(trade['Resultado (R)']) > 0).length;
+            const lossesCount = totalTrades - winsCount;
+            
+            // Taxa de acerto
+            const winRate = winsCount / totalTrades;
+            
+            // Calcular expectativa
+            const expectancy = trades.reduce((sum, trade) => sum + parseFloat(trade['Resultado (R)']), 0) / totalTrades;
+            
+            // Calcular médias de ganhos e perdas
+            const winValues = trades.filter(trade => parseFloat(trade['Resultado (R)']) > 0)
+                .map(trade => parseFloat(trade['Resultado (R)']));
+            
+            const lossValues = trades.filter(trade => parseFloat(trade['Resultado (R)']) <= 0)
+                .map(trade => parseFloat(trade['Resultado (R)']));
+            
+            const avgWin = winValues.length > 0 ? winValues.reduce((sum, val) => sum + val, 0) / winValues.length : 0;
+            const avgLoss = lossValues.length > 0 ? Math.abs(lossValues.reduce((sum, val) => sum + val, 0) / lossValues.length) : 0;
+            
+            // Calcular fator de lucro
+            const totalProfit = winValues.reduce((sum, val) => sum + val, 0);
+            const totalLoss = Math.abs(lossValues.reduce((sum, val) => sum + val, 0));
+            
+            const profitFactor = totalLoss === 0 ? Infinity : totalProfit / totalLoss;
+            
+            return {
+                totalTrades,
+                winsCount,
+                lossesCount,
+                winRate,
+                expectancy,
+                avgWin,
+                avgLoss,
+                profitFactor
+            };
+        }
+    </script>
+    <script src="tests.js"></script>
+</body>
+</html>
