@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário de Trading - Sistema Price Action Brooks</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Navbar -->
+    <nav class="bg-trading-dark text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-xl font-bold">Price Action Trading System</h1>
+                <span class="text-sm bg-blue-500 px-2 py-1 rounded">Al Brooks Methodology</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <input type="text" placeholder="Pesquisar..." class="bg-gray-700 text-white px-4 py-2 rounded text-sm">
+                </div>
+                <div id="current-pair" class="flex items-center space-x-2">
+                    <span class="text-sm">EUR/USD: 1.0842</span>
+                    <span class="text-green-400 text-xs">+0.12%</span>
+                </div>
+                <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="font-bold">TR</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="bg-trading-dark text-white w-64 sidebar overflow-y-auto" id="sidebar">
+            <div class="p-4">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold mb-2">Menu Principal</h2>
+                    <ul class="space-y-2">
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="index.html" class="block"><i class="fas fa-chart-line mr-2"></i>Dashboard</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="register.html" class="block"><i class="fas fa-plus-circle mr-2"></i>Nova Análise</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="history.html" class="block"><i class="fas fa-history mr-2"></i>Histórico de Trades</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="statistics.html" class="block"><i class="fas fa-chart-pie mr-2"></i>Estatísticas</a></li>
+                        <li class="bg-blue-600 p-2 rounded"><a href="journal.html" class="block"><i class="fas fa-book mr-2"></i>Diário de Trading</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h2 class="text-lg font-bold mb-2">Categorias</h2>
+                    <ul class="space-y-2">
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block" data-category="all">Todas as Entradas</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block" data-category="patterns">Padrões Price Action</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block" data-category="psychology">Psicologia de Trading</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block" data-category="mistakes">Erros e Lições</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block" data-category="strategy">Estratégia</a></li>
+                        <li class="hover:bg-gray-700 p-2 rounded"><a href="#" class="block" data-category="risk">Gestão de Risco</a></li>
+                    </ul>
+                </div>
+                
+                <div class="mt-6">
+                    <h2 class="text-lg font-bold mb-2">Filtro de Data</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">De:</label>
+                            <input type="date" id="date-from" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Até:</label>
+                            <input type="date" id="date-to" class="w-full bg-gray-700 text-white px-3 py-2 rounded text-sm">
+                        </div>
+                        <div class="pt-2">
+                            <button type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded" id="apply-date-filter">
+                                <i class="fas fa-filter mr-2"></i>Aplicar Filtro
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 content p-6">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Diário de Trading</h2>
+                    <div>
+                        <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 mr-2" id="export-btn">
+                            <i class="fas fa-file-export mr-2"></i>Exportar
+                        </button>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="new-entry-btn">
+                            <i class="fas fa-plus mr-2"></i>Nova Entrada
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="text-center p-4">
+                    <i class="fas fa-spinner fa-spin fa-2x text-blue-500"></i>
+                    <p class="mt-2">Carregando entradas do diário...</p>
+                </div>
+
+                <!-- Journal Entries -->
+                <div id="journal-entries" class="hidden">
+                    <!-- Será preenchido via JavaScript -->
+                </div>
+                
+                <!-- Mensagem de Nenhuma Entrada -->
+                <div id="no-entries-message" class="bg-white rounded-lg shadow-md p-6 mb-6 text-center hidden">
+                    <i class="fas fa-book text-4xl text-gray-400 mb-3"></i>
+                    <h3 class="text-lg font-bold mb-2">Nenhuma entrada no diário</h3>
+                    <p class="text-gray-600">Registre suas reflexões e aprendizados para acompanhar sua evolução.</p>
+                    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" id="start-journal-btn">
+                        <i class="fas fa-plus mr-2"></i>Começar Diário
+                    </button>
+                </div>
+                
+                <!-- Paginação -->
+                <div id="pagination" class="flex justify-center mt-6 hidden">
+                    <div class="flex space-x-2">
+                        <button id="prev-page" class="px-3 py-1 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div id="page-numbers" class="flex space-x-1">
+                            <!-- Será preenchido via JavaScript -->
+                        </div>
+                        <button id="next-page" class="px-3 py-1 bg-gray-200 rounded-md text-gray-700 hover:bg-gray-300" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Nova Entrada -->
+    <div id="journal-entry-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-3xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="modal-title">Nova Entrada no Diário</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="journal-form">
+                <input type="hidden" id="entry-id" value="">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                    <input type="text" id="entry-title" class="w-full border border-gray-300 rounded-md px-3 py-2" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                    <input type="date" id="entry-date" class="w-full border border-gray-300 rounded-md px-3 py-2" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                    <select id="entry-category" class="w-full border border-gray-300 rounded-md px-3 py-2" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="patterns">Padrões Price Action</option>
+                        <option value="psychology">Psicologia de Trading</option>
+                        <option value="mistakes">Erros e Lições</option>
+                        <option value="strategy">Estratégia</option>
+                        <option value="risk">Gestão de Risco</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Conteúdo</label>
+                    <textarea id="entry-content" class="w-full border border-gray-300 rounded-md px-3 py-2" rows="10" required></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Emoção Predominante</label>
+                    <div class="flex space-x-4 flex-wrap">
+                        <div class="flex items-center mb-2">
+                            <input type="radio" name="entry-emotion" id="emotion-neutral" value="neutral" class="mr-2" checked>
+                            <label for="emotion-neutral" class="text-gray-600">Neutro</label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" name="entry-emotion" id="emotion-confident" value="confident" class="mr-2">
+                            <label for="emotion-confident" class="text-blue-600">Confiante</label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" name="entry-emotion" id="emotion-focused" value="focused" class="mr-2">
+                            <label for="emotion-focused" class="text-purple-600">Focado</label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" name="entry-emotion" id="emotion-anxious" value="anxious" class="mr-2">
+                            <label for="emotion-anxious" class="text-yellow-600">Ansioso</label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" name="entry-emotion" id="emotion-frustrated" value="frustrated" class="mr-2">
+                            <label for="emotion-frustrated" class="text-red-600">Frustrado</label>
+                        </div>
+                        <div class="flex items-center mb-2">
+                            <input type="radio" name="entry-emotion" id="emotion-satisfied" value="satisfied" class="mr-2">
+                            <label for="emotion-satisfied" class="text-green-600">Satisfeito</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Anexar Screenshot (opcional)</label>
+                    <div id="screenshot-upload" class="border border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer">
+                        <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                        <p class="text-sm text-gray-500">Arraste uma imagem ou clique para fazer upload</p>
+                        <input type="file" id="screenshot-input" class="hidden" accept="image/*">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400" id="cancel-btn">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 bg-green-500 text-white rounded shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+        <span id="toast-message">Operação realizada com sucesso!</span>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/journal.js"></script>
+</body>
+</html>
